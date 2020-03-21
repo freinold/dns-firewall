@@ -1,8 +1,35 @@
 # Basic configuration
 ## Install Raspbian (Lite)
 
+## Change user
+- Add new user `fw` and grant him sudo privileges:
+```bash
+pi@raspberry:~ $ sudo adduser fw # Passwort prompt will open
+pi@raspberry:~ $ sudo adduser fw sudo
+```
+- Log out as pi and log in as fw:
+```bash
+pi@raspberry:~ $ exit
+login as: fw
+fw's password:
+fw@raspberry:~ $ 
+```
+- Delete user `pi`:
+```bash
+fw@raspberry:~ $ sudo userdel -r pi
+```
+- Change Hostname:
+```bash
+fw@raspberry:~ $ sudo raspi-config
+```
+`2 Network Options`
+`N1 Hostname`
+Enter new hostname `dns-firewall` and click `Enter`.
+Exit raspi-config by clicking `Finish`.
+Confirm reboot by chossing `<Yes>` and log back in after.
+
 ## Disable Wifi and Bluetooth
--Add these lines to /boot/config.txt:
+- Add these lines at the bottom of `/boot/config.txt`:
 ```bash
 # ADDITIONAL: Disable WIFI and BLUETOOTH
 dtoverlay=disable-wifi
