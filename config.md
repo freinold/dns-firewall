@@ -66,10 +66,11 @@ Transfer image to SD
   fw@dns-firewall:~ $ sudo userdel -r pi
   ```
 ## Disable Wifi and Bluetooth
-- Add these lines at the bottom of `/boot/config.txt`:
+- Open `/boot/config.txt`:
   ```bash
   fw@dns-firewall:~ $ sudo nano /boot/config.txt
   ```
+- Add these lines at the bottom of the file:
   ```bash
   # ADDITIONAL: Disable WIFI and BLUETOOTH
   dtoverlay=disable-wifi
