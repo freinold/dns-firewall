@@ -28,7 +28,7 @@
   
   Exit raspi-config by clicking `Finish`.
   
-  Confirm reboot by chossing `<Yes>` and log back in after:
+  Confirm reboot by chossing `<Yes>` and log back in afterwards:
   ```bash
   fw@dns-firewall:~ $ 
   ```
