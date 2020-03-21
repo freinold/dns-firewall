@@ -7,7 +7,7 @@
   pi@raspberry:~ $ sudo adduser fw # Passwort prompt will open
   pi@raspberry:~ $ sudo adduser fw sudo
   ```
-- Log out as pi and log in as fw:
+- Log out as `pi` and log in as `fw`:
   ```bash
   pi@raspberry:~ $ exit
   login as: fw
@@ -23,9 +23,12 @@
   fw@raspberry:~ $ sudo raspi-config
   ```
   Pick `2 Network Options` and next `N1 Hostname`.
+  
   Enter new hostname "dns-firewall" and click `Enter`.
+  
   Exit raspi-config by clicking `Finish`.
-  Confirm reboot by chossing `<Yes>` and log back in after.
+  
+  Confirm reboot by chossing `<Yes>` and log back in after:
   ```bash
   fw@dns-firewall:~ $ 
   ```
