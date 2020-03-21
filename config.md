@@ -22,9 +22,8 @@ fw@raspberry:~ $ sudo userdel -r pi
 ```bash
 fw@raspberry:~ $ sudo raspi-config
 ```
-`2 Network Options`
-`N1 Hostname`
-Enter new hostname `dns-firewall` and click `Enter`.
+Pick `2 Network Options` and next `N1 Hostname`.
+Enter new hostname "dns-firewall" and click `Enter`.
 Exit raspi-config by clicking `Finish`.
 Confirm reboot by chossing `<Yes>` and log back in after.
 
