@@ -2,7 +2,7 @@
 ## Hardware
 Raspberry Pi 4 and PoE Hat
 ## Install Raspbian (Lite)
-Transfer image to SSD
+Transfer image to SD
 ## Start Raspberry
 - Connect to Router by Ethernet
 - Connect power to raspberry pi
