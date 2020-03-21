@@ -13,14 +13,14 @@ Transfer image to SD
   ```bash
   pi@raspberry:~ $ sudo raspi-config
   ```
-- Change Hostname:
+- Change Hostname:  
   Pick `2 Network Options` and next `N1 Hostname`  
   Enter new hostname "dns-firewall" and click `Enter`.
-- Wait for Network at Boot:
+- Wait for Network at Boot:  
   Pick `3 Boot Options` and next `B2 Wait for Network at Boot`, where you choose `<Yes>`
-- Expand Filesystem:
+- Expand Filesystem:  
   Pick `7 Advanced Options` and next `A1 Expand Filesystem`.
-- Exit raspi-config:
+- Exit raspi-config:  
   Pick `<Finish>` in the main menu.  
   Confirm reboot by chossing `<Yes>`.  
   When you log back in afterwards, the hostname in the console should have changed: 
