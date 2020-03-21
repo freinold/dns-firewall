@@ -1,3 +1,6 @@
+  ```bash
+  pi@raspberry:~ $ 
+  ```
 # Basic configuration
 ## Hardware
 Raspberry Pi 4 and PoE Hat
@@ -8,6 +11,24 @@ Transfer image to SD
 - Connect Raspberry Pi to Power
 - Get IP Adress from Router Interface
 - Login via SSH: Standard User is `pi`; Password is `raspberry`
+## Check internet connection
+- Try to ping Google:
+  ```bash
+  pi@raspberry:~ $ ping www.google.com
+  ```
+## Update and upgrade software
+- Update package lists:
+  ```bash
+  pi@raspberry:~ $ sudo apt update
+  ```
+- Upgrade packages:
+  ```bash
+  pi@raspberry:~ $ sudo apt full-upgrade
+  ```
+- Remove old packages: 
+  ```bash
+  pi@raspberry:~ $ sudo apt autoremove
+  ```
 ## First configurations via raspi-config
 - Launch raspi-config:
   ```bash
@@ -44,10 +65,11 @@ Transfer image to SD
   ```bash
   fw@dns-firewall:~ $ sudo userdel -r pi
   ```
-
-
 ## Disable Wifi and Bluetooth
 - Add these lines at the bottom of `/boot/config.txt`:
+  ```bash
+  fw@dns-firewall:~ $ sudo nano /boot/config.txt
+  ```
   ```bash
   # ADDITIONAL: Disable WIFI and BLUETOOTH
   dtoverlay=disable-wifi
