@@ -1,6 +1,8 @@
 # Basic configuration
-## Install Raspbian (Lite) & expand filesystem in raspi-config
-
+## Install Raspbian (Lite) 
+### raspi-config:
+expand filesystem
+activate wait for network while booting
 ## Change user
 - Add new user `fw` and grant him sudo privileges:
   ```bash
