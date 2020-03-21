@@ -1,5 +1,5 @@
 # Basic configuration
-## Install Raspbian (Lite)
+## Install Raspbian (Lite) & expand filesystem in raspi-config
 
 ## Change user
 - Add new user `fw` and grant him sudo privileges:
