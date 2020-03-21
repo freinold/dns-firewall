@@ -1,5 +1,5 @@
   ```bash
-  pi@raspberry:~ $ 
+  fw@dns-firewall:~ $ 
   ```
 # Basic configuration
 ## Hardware
