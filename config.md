@@ -4,44 +4,47 @@ Raspberry Pi 4 and PoE Hat
 ## Install Raspbian (Lite)
 Transfer image to SD
 ## Start Raspberry
-- Connect to Router by Ethernet
-- Connect power to raspberry pi
-- Get IP Adress from router
-- Login via SSH: user `pi`, password `raspberry`
-### raspi-config:
-expand filesystem &
-activate wait for network while booting
+- Connect to Router by Ethernet Cable
+- Connect Raspberry Pi to Power
+- Get IP Adress from Router Interface
+- Login via SSH: Standard User is `pi`; Password is `raspberry`
+## First configurations via raspi-config
+- Launch raspi-config:
+  ```bash
+  pi@raspberry:~ $ sudo raspi-config
+  ```
+- Change Hostname:
+  Pick `2 Network Options` and next `N1 Hostname`  
+  Enter new hostname "dns-firewall" and click `Enter`.
+- Wait for Network at Boot:
+  Pick `3 Boot Options` and next `B2 Wait for Network at Boot`, where you choose `<Yes>`
+- Expand Filesystem:
+  Pick `7 Advanced Options` and next `A1 Expand Filesystem`.
+- Exit raspi-config:
+  Pick `<Finish>` in the main menu.  
+  Confirm reboot by chossing `<Yes>`.  
+  When you log back in afterwards, the hostname in the console should have changed: 
+  ```bash
+  pi@dns-firewall:~ $ 
+  ```
 ## Change user
 - Add new user `fw` and grant him sudo privileges:
   ```bash
-  pi@raspberry:~ $ sudo adduser fw # Passwort prompt will open
-  pi@raspberry:~ $ sudo adduser fw sudo
+  pi@dns-firewall:~ $ sudo adduser fw # Passwort prompt will open
+  pi@dns-firewall:~ $ sudo adduser fw sudo
   ```
 - Log out as `pi` and log in as `fw`:
   ```bash
-  pi@raspberry:~ $ exit
+  pi@dns-firewall:~ $ exit
   login as: fw
   fw's password:
-  fw@raspberry:~ $ 
+  fw@dns-firewall:~ $ 
   ```
 - Delete user `pi`:
   ```bash
-  fw@raspberry:~ $ sudo userdel -r pi
+  fw@dns-firewall:~ $ sudo userdel -r pi
   ```
-- Change Hostname:
-  ```bash
-  fw@raspberry:~ $ sudo raspi-config
-  ```
-  Pick `2 Network Options` and next `N1 Hostname`.
-  
-  Enter new hostname "dns-firewall" and click `Enter`.
-  
-  Exit raspi-config by clicking `Finish`.
-  
-  Confirm reboot by chossing `<Yes>` and log back in afterwards:
-  ```bash
-  fw@dns-firewall:~ $ 
-  ```
+
 
 ## Disable Wifi and Bluetooth
 - Add these lines at the bottom of `/boot/config.txt`:
