@@ -1,5 +1,13 @@
 # Basic configuration
-## Install Raspbian (Lite) 
+## Hardware
+Raspberry Pi 4 and PoE Hat
+## Install Raspbian (Lite)
+Transfer image to SSD
+## Start Raspberry
+- Connect to Router by Ethernet
+- Connect power to raspberry pi
+- Get IP Adress from router
+- Login via SSH: user `pi`, password `raspberry`
 ### raspi-config:
 expand filesystem &
 activate wait for network while booting
