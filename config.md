@@ -3,12 +3,19 @@
   ```
 # Basic configuration
 ## Hardware
-Raspberry Pi 4 and PoE Hat
+Raspberry Pi 4 (2GB?), SD Card (TODO: Size?) and Raspberry Pi PoE Hat
 ## Install Raspbian (Lite)
-Transfer image to SD
-## Start Raspberry
-- Connect to Router by Ethernet Cable
-- Connect Raspberry Pi to Power
+Transfer image to SD Card
+## Disable Wifi and Bluetooth
+- Open `config.txt` on the `Boot` Partition of the SD Card and add these lines at the bottom of the file:
+  ```bash
+  # Disable wifi and bluetooth
+  dtoverlay=disable-wifi
+  dtoverlay=disable-bt
+  ```
+## Start up
+- Connect Raspberry Pi to Router by Ethernet Cable
+- (Connect Raspberry Pi to Power Cable)
 - Get IP Adress from Router Interface
 - Login via SSH: Standard User is `pi`; Password is `raspberry`
 ## Check internet connection
@@ -64,15 +71,4 @@ Transfer image to SD
 - Delete user `pi`:
   ```bash
   fw@dns-firewall:~ $ sudo userdel -r pi
-  ```
-## Disable Wifi and Bluetooth
-- Open `/boot/config.txt`:
-  ```bash
-  fw@dns-firewall:~ $ sudo nano /boot/config.txt
-  ```
-- Add these lines at the bottom of the file:
-  ```bash
-  # ADDITIONAL: Disable WIFI and BLUETOOTH
-  dtoverlay=disable-wifi
-  dtoverlay=disable-bt
   ```
