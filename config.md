@@ -1,4 +1,4 @@
-  ```bash
+  ```console
   fw@dns-firewall:~ $ 
   ```
 # Basic configuration
@@ -20,25 +20,25 @@ Transfer image to SD Card
 - Login via SSH: Standard User is `pi`; Password is `raspberry`
 ## Check internet connection
 - Try to ping Google:
-  ```bash
+  ```console
   pi@raspberry:~ $ ping www.google.com
   ```
 ## Update and upgrade software
 - Update package lists:
-  ```bash
+  ```console
   pi@raspberry:~ $ sudo apt update
   ```
 - Upgrade packages:
-  ```bash
+  ```console
   pi@raspberry:~ $ sudo apt full-upgrade
   ```
 - Remove old packages: 
-  ```bash
+  ```console
   pi@raspberry:~ $ sudo apt autoremove
   ```
 ## First configurations via raspi-config
 - Launch raspi-config:
-  ```bash
+  ```console
   pi@raspberry:~ $ sudo raspi-config
   ```
 - Change Hostname:  
@@ -52,23 +52,23 @@ Transfer image to SD Card
   Pick `<Finish>` in the main menu.  
   Confirm reboot by chossing `<Yes>`.  
   When you log back in afterwards, the hostname in the console should have changed: 
-  ```bash
+  ```console
   pi@dns-firewall:~ $ 
   ```
 ## Change user
 - Add new user `fw` and grant him sudo privileges:
-  ```bash
+  ```console
   pi@dns-firewall:~ $ sudo adduser fw # Passwort prompt will open
   pi@dns-firewall:~ $ sudo adduser fw sudo
   ```
 - Log out as `pi` and log in as `fw`:
-  ```bash
+  ```console
   pi@dns-firewall:~ $ exit
   login as: fw
-  fw's password:
+  fws password:
   fw@dns-firewall:~ $ 
   ```
 - Delete user `pi`:
-  ```bash
+  ```console
   fw@dns-firewall:~ $ sudo userdel -r pi
   ```
