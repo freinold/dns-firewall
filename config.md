@@ -65,7 +65,7 @@ Transfer image to SD Card
   ```console
   pi@dns-firewall:~ $ exit
   login as: fw
-  fws password:
+  fw's password:
   fw@dns-firewall:~ $ 
   ```
 - Delete user `pi`:
