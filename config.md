@@ -72,3 +72,8 @@ Transfer image to SD Card
   ```console
   fw@dns-firewall:~ $ sudo userdel -r pi
   ```
+## Install necessary packages
+```console
+fw@dns-firewall:~ $ sudo apt update
+fw@dns-firewall:~ $ sudo apt install bind9 bind9-doc bind9utils dnsutils -y
+```
