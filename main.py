@@ -6,14 +6,16 @@ import os
 
 
 def main() -> None:
-    configure_logs()
+    is_installed: bool = os.path.isdir("/etc/dns-fw")
+    configure_logs(is_installed)
     # Check if dns-firewall is already installed
     if not os.path.isfile("/etc/dns-fw/config"):
         install()
 
 
-def configure_logs() -> None:
-    if not os.path.isfile("/etc/dns-fw/log"):
+def configure_logs(is_installed: bool) -> None:
+    if not is_installed:
+        os.mkdir("/etc/dns-fw")
         open("/etc/dns-fw/log").close()
     logging.basicConfig(filename="/etc/dns-fw/log")
 
