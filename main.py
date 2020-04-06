@@ -87,7 +87,8 @@ def install() -> None:
         output = _bash("sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | "
                        "grep 'scan report' | "
                        "awk '{print $5}'")
-        print(output)
+        devices = output.split("\n")
+        print(devices)
     except subprocess.CalledProcessError as error:
         logging.error("Error scanning local network: %s\nAborting now.", error.stderr)
         exit(-1)
