@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import ipaddress
 import logging
 import os
 import shutil
@@ -83,19 +84,22 @@ def install() -> None:
 
     # GET ACTIVE CLIENTS INFO
     logging.info("Scanning network for active clients to get a free address.")
+    devices = []
     try:
-        output = _bash("sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | "
+        output = _bash("sudo nmap -sn -n {0} --exclude {1} | "
                        "grep 'scan report' | "
-                       "awk '{print $5}'")
-        devices = output.split("\n")
+                       "awk '{{print $5}}'".format(config["subnet"], config["dynamic_ip"]))
+        devices = list(map(lambda x: ipaddress.ip_address(x), output.split("\n")))
         print(devices)
     except subprocess.CalledProcessError as error:
         logging.error("Error scanning local network: %s\nAborting now.", error.stderr)
         exit(-1)
 
     # STATIC IP
-    logging.info("Changing to static IP address configuration.")
+    logging.info("Calculating for a static IP.")
+
     # TODO: Scan with nmap and set rules for address change (out of DHCPCD range)
+    logging.info("Changing to static IP address configuration.")
     config["static_ip"] = config["dynamic_ip"]
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
     logging.debug("Saved original dhcpcd configuration with suffix '.original'.")
