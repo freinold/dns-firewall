@@ -10,7 +10,7 @@ LOG_FILE = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
 APT_PACKAGES = ["bind9", "bind9utils", "dnsutils", "nmap"]
 
-LOGO = '''\033[33m
+LOGO_OLD = '''\033[33m
   (         )  (         (     (    (                           (     (     
   )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      (  (       (      )\ )  )\ )  
  (()/(   )\())(()/(     (()/( (()/((()/( (    )\))(   '  )\    (()/( (()/(  
@@ -21,20 +21,30 @@ LOGO = '''\033[33m
   |___/ |_|\_||___/     |_|   |___||_|_\|___|  \_/\_/  /_/ \_\ |____||____| 
   \033[0m'''
 
+LOGO = '''\033[33m
+  (         )  (         (     (    (         (  (       (      (     (     
+  )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      )\))(   '  )\     )\ )  )\ )  
+ (()/(   )\())(()/(     (()/( (()/((()/( (  ((_)()\ )((((_)(   (()/( (()/(  \033[31m
+ /(_)) ((_)\  /(_))     /(_)) /(_))/(_)))\  (_(())\_)())\ _ )\ /(_)) /(_)) 
+ (_))_   _((_)(_))      (_))_|(_)) (_)) ((_) _()    \))\ _ /  (_))  (_))   
+ \033[7m |   \ | \| |/ __| ___ | |_  |_ _|| _ \| __|\ \    / /  /_\   | |   | |    
+  | |) || .` |\__ \|___|| __|  | | |   /| _|  \ \/\/ /  / _ \  | |__ | |__  
+  |___/ |_|\_||___/     |_|   |___||_|_\|___|  \_/\_/  /_/ \_\ |____||____| \033[0m'''
+
 
 def main() -> None:
     print(LOGO)
+    os.makedirs(DIR, exist_ok=True)
+    configure_logs()
     # Check if dns-firewall is already installed
     is_installed: bool = os.path.isfile(FW_CONF)
-    configure_logs(is_installed)
     if not is_installed:
         logging.warning("Software not installed. Starting installation now.")
         install()
 
 
-def configure_logs(is_installed: bool) -> None:
-    if not is_installed:
-        os.makedirs("/etc/dns-fw", exist_ok=True)
+def configure_logs() -> None:
+    if not os.path.isfile(LOG_FILE):
         os.mknod(LOG_FILE)
     logging.basicConfig(
         datefmt="%Y-%m-%d %H:%M:%S",
