@@ -10,6 +10,7 @@ def main() -> None:
     configure_logs(is_installed)
     # Check if dns-firewall is already installed
     if not is_installed:
+        logging.info("Software not installed. Starting installation now.")
         install()
 
 
@@ -17,11 +18,12 @@ def configure_logs(is_installed: bool) -> None:
     if not is_installed:
         os.mkdir("/etc/dns-fw")
         os.mknod("/etc/dns-fw/log")
-    logging.basicConfig(filename="/etc/dns-fw/log")
+    logging.basicConfig(filename="/etc/dns-fw/log", level=logging.INFO)
+    logging.info("Logging is set up.")
 
 
 def install() -> None:
-    # Get BIND9 and supporting packages.
+    logging.info("Getting BIND9 and supporting packages.")
     try:
         _bash("sudo apt update")
         _bash("sudo apt install bind9 bind9utils dnsutils -y")
@@ -30,9 +32,7 @@ def install() -> None:
         exit(-1)
     # Get local subnet and router
     try:
-        cp = _bash("ip addr show eth0 | grep 'inet ' | awk '{print $2}'")
-        print(type(cp.stdout))
-        print(cp.stdout)
+        cp = _bash("ip route | grep 'default' | awk '{print $3, $7}'")
         current_ip, router = cp.stdout.split(" ")
         print(current_ip, router)
         cp = _bash("ip route")
