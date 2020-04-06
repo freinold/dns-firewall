@@ -76,7 +76,7 @@ def install() -> None:
         config["dynamic_ip"], config["router"] = output.split(" ")
         config["subnet"] = _bash("ip route | "
                                  "grep -v 'default' | "
-                                 "awk '{print $1}'")
+                                 "awk '{print $1}'").rstrip()
         logging.info("IP-Address: %s, Router: %s, Subnet: %s", config["dynamic_ip"], config["router"], config["subnet"])
     except subprocess.CalledProcessError as error:
         logging.error("Error getting required local network information: %s\nAborting now.", error.stderr)
@@ -89,6 +89,7 @@ def install() -> None:
         output = _bash("sudo nmap -sn -n {0} --exclude {1} | "
                        "grep 'scan report' | "
                        "awk '{{print $5}}'".format(config["subnet"], config["dynamic_ip"]))
+        print(output)
         devices = list(map(lambda x: ipaddress.ip_address(x), output.split("\n")))
         print(devices)
     except subprocess.CalledProcessError as error:
