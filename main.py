@@ -53,7 +53,7 @@ def install() -> None:
 
 
 def _bash(cmd: str) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, shell=True, check=True, executable="/bin/bash", capture_output=True)
+    return subprocess.run(cmd, shell=True, check=True, executable="/bin/bash", capture_output=True, text=True)
 
 
 if __name__ == '__main__':
