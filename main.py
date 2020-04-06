@@ -34,7 +34,7 @@ def main() -> None:
 
 def configure_logs(is_installed: bool) -> None:
     if not is_installed:
-        os.mkdir("/etc/dns-fw")
+        os.makedirs("/etc/dns-fw", exist_ok=True)
         os.mknod(LOG_FILE)
     logging.basicConfig(
         datefmt="%Y-%m-%d %H:%M:%S",
