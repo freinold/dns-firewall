@@ -26,8 +26,8 @@ LOGO = '''\033[33m
   )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      )\))(   '  )\     )\ )  )\ )  
  (()/(   )\())(()/(     (()/( (()/((()/( (  ((_)()\ )((((_)(   (()/( (()/(  \033[31m
  /(_)) ((_)\  /(_))     /(_)) /(_))/(_)))\  (_(())\_)())\ _ )\ /(_)) /(_)) 
- (_))_   _((_)(_))      (_))_|(_)) (_)) ((_) _()    \))\ _ /  (_))  (_))   
-\033[7m  |   \ | \| |/ __| ___ | |_  |_ _|| _ \| __|\ \    / /  /_\   | |   | |    
+ (_))_   _((_)(_))      (_))_|(_)) (_)) ((_) _()    \))\ _ /  (_))  (_))   \033[7m
+  |   \ | \| |/ __| ___ | |_  |_ _|| _ \| __|\ \    / /  /_\   | |   | |    
   | |) || .` |\__ \|___|| __|  | | |   /| _|  \ \/\/ /  / _ \  | |__ | |__  
   |___/ |_|\_||___/     |_|   |___||_|_\|___|  \_/\_/  /_/ \_\ |____||____| \033[0m'''
 
@@ -72,11 +72,11 @@ def install() -> None:
         output = _bash("ip route | "
                        "grep 'default' | "
                        "awk '{print $3, $7}'")
-        config.dynamic_ip, config.router = output.split(" ")
-        config.subnet = _bash("ip route | "
-                              "grep -v 'default' | "
-                              "awk '{print $1}'")
-        logging.info("IP-Address: %s, Router: %s, Subnet: %s", config.dynamic_ip, config.router, config.subnet)
+        config["dynamic_ip"], config["router"] = output.split(" ")
+        config["subnet"] = _bash("ip route | "
+                                 "grep -v 'default' | "
+                                 "awk '{print $1}'")
+        logging.info("IP-Address: %s, Router: %s, Subnet: %s", config["dynamic_ip"], config["router"], config["subnet"])
     except subprocess.CalledProcessError as error:
         logging.error("Error getting required local network information: %s\nAborting now.", error.stderr)
         exit(-1)
@@ -87,6 +87,7 @@ def install() -> None:
         output = _bash("sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | "
                        "grep 'scan report' | "
                        "awk '{print $5}'")
+        print(output)
     except subprocess.CalledProcessError as error:
         logging.error("Error scanning local network: %s\nAborting now.", error.stderr)
         exit(-1)
@@ -94,7 +95,7 @@ def install() -> None:
     # STATIC IP
     logging.info("Changing to static IP address configuration.")
     # TODO: Scan with nmap and set rules for address change (out of DHCPCD range)
-    config.static_ip = config.dynamic_ip
+    config["static_ip"] = config["dynamic_ip"]
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
     logging.debug("Saved original dhcpcd configuration with suffix '.original'.")
     with open(DHCPCD_CONF, "a") as dhcpcd_conf:
@@ -102,7 +103,7 @@ def install() -> None:
                       "interface eth0 \n" \
                       "static ip_address={0} \n" \
                       "static routers={1} \n" \
-                      "static domain_name_servers={0} \n".format(config.static_ip, config.router)
+                      "static domain_name_servers={0} \n".format(config["static_ip"], config["router"])
         dhcpcd_conf.write(static_conf)
     logging.debug("Appended static configuration in dhcpcd.conf file.")
 
