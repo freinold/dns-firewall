@@ -4,16 +4,21 @@ import shutil
 import subprocess
 import os
 
-logging.basicConfig(filename="/etc/dns-fw/log")
-
 
 def main() -> None:
+    configure_logs()
     # Check if dns-firewall is already installed
-    if not os.path.isdir("/etc/dns-fw"):
+    if not os.path.isfile("/etc/dns-fw/config"):
         install()
 
 
-def install():
+def configure_logs() -> None:
+    if not os.path.isfile("/etc/dns-fw/log"):
+        open("/etc/dns-fw/log").close()
+    logging.basicConfig(filename="/etc/dns-fw/log")
+
+
+def install() -> None:
     # Get BIND9 and supporting packages.
     try:
         _bash("sudo apt update")
