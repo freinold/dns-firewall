@@ -18,7 +18,12 @@ def configure_logs(is_installed: bool) -> None:
     if not is_installed:
         os.mkdir("/etc/dns-fw")
         os.mknod("/etc/dns-fw/log")
-    logging.basicConfig(filename="/etc/dns-fw/log", level=logging.INFO)
+    logging.basicConfig(
+        datefmt="%Y-%m-%d %H:%M:%S",
+        filename="/etc/dns-fw/log",
+        format="%(asctime)s - %(levelname)s: %(message)s",
+        level=logging.INFO,
+    )
     logging.info("Logging is set up.")
 
 
