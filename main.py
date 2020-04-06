@@ -31,6 +31,8 @@ def install() -> None:
     # Get local subnet and router
     try:
         cp = _bash("ip addr show eth0 | grep 'inet ' | awk '{print $2}'")
+        print(type(cp.stdout))
+        print(cp.stdout)
         current_ip, router = cp.stdout.split(" ")
         print(current_ip, router)
         cp = _bash("ip route")
