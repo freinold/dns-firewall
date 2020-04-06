@@ -34,7 +34,7 @@ LOGO = '''\033[33m
 
 
 def main() -> None:
-    print(LOGO)
+    # TODO: print(LOGO)
     os.makedirs(DIR, exist_ok=True)
     configure_logs()
     # Check if dns-firewall is already installed
