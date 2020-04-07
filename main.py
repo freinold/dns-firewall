@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 
-DHCPCD_CONF = "/etc/dhcpcd.conf"
+DHCPCD_CONF = "/dns-fw/dhcpcd.conf"
 DIR = "/etc/dns-fw"
 LOG_FILE = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
@@ -70,13 +70,9 @@ def install() -> None:
     # GET SUBNET INFO
     logging.info("Gathering local subnet and router information.")
     try:
-        output = _bash("ip route | "
-                       "grep 'default' | "
-                       "awk '{print $3, $7}'")
-        config["router"], config["dynamic_ip"] = output.strip().split(" ")
-        config["subnet"] = _bash("ip route | "
-                                 "grep -v 'default' | "
-                                 "awk '{print $1}'").rstrip()
+        output = _bash("ip route | grep 'default' | awk '{print $3, $7}'")
+        config["router"], config["dynamic_ip"] = map(lambda x: ipaddress.ip_address(x), output.strip().split(" "))
+        config["subnet"] = ipaddress.ip_network(_bash("ip route | grep -v 'default' | awk '{print $1}'").rstrip())
         logging.info("IP-Address: %s, Router: %s, Subnet: %s", config["dynamic_ip"], config["router"], config["subnet"])
     except subprocess.CalledProcessError as error:
         logging.error("Error getting required local network information: %s\nAborting now.", error.stderr)
@@ -94,12 +90,16 @@ def install() -> None:
         logging.error("Error scanning local network: %s\nAborting now.", error.stderr)
         exit(-1)
 
-    # STATIC IP
+    # CALCULATE STATIC IP
+    # TODO:  set rules for address change (out of DHCPCD range)
     logging.info("Calculating for a static IP.")
+    for host in config["subnet"].hosts():
+        if host not in devices:
+            config["static_ip"] = host
+            break
 
-    # TODO: Scan with nmap and set rules for address change (out of DHCPCD range)
+    # SET STATIC IP
     logging.info("Changing to static IP address configuration.")
-    config["static_ip"] = config["dynamic_ip"]
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
     logging.debug("Saved original dhcpcd configuration with suffix '.original'.")
     with open(DHCPCD_CONF, "a") as dhcpcd_conf:
