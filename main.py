@@ -51,7 +51,7 @@ def configure_logs() -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
         filename=LOG_FILE,
         format="%(asctime)s - %(levelname)s: %(message)s",
-        level=logging.DEBUG,
+        level=logging.INFO,
     )
     logging.info("DNS-FIREWALL started.")
 
