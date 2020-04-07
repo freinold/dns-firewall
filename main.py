@@ -59,6 +59,8 @@ def install() -> None:
     except subprocess.CalledProcessError as error:
         logging.error("Error installing required packages: {0} \nAborting now.".format(error.stderr))
         exit(-1)
+    finally:
+        logging.info("All required packages downloaded.")
 
     # GET SUBNET INFO
     logging.info("Gathering local subnet and router information.")
@@ -66,14 +68,15 @@ def install() -> None:
         output = _bash("ip route | grep 'default' | awk '{print $3, $7}'")
         config["router"], config["dynamic_ip"] = map(lambda x: ipaddress.ip_address(x), output.strip().split(" "))
         config["subnet"] = ipaddress.ip_network(_bash("ip route | grep -v 'default' | awk '{print $1}'").rstrip())
-        logging.info("IP-Address: {0}, Router: {1}, Subnet: {2}"
-                     .format(config["dynamic_ip"], config["router"], config["subnet"]))
     except subprocess.CalledProcessError as error:
         logging.error("Error getting required local network information: {0}\nAborting now.".format(error.stderr))
         exit(-1)
+    finally:
+        logging.info("IP-Address: {0}, Router: {1}, Subnet: {2}"
+                     .format(config["dynamic_ip"], config["router"], config["subnet"]))
 
     # GET ACTIVE CLIENTS INFO
-    logging.info("Scanning network for active clients to get a free address.")
+    logging.info("Scanning network for active host to get used addresses.")
     devices = []
     try:
         output = _bash("sudo nmap -sn -n {0} --exclude {1} | "
@@ -83,20 +86,22 @@ def install() -> None:
     except subprocess.CalledProcessError as error:
         logging.error("Error scanning local network: {0}\nAborting now.".format(error.stderr))
         exit(-1)
+    finally:
+        logging.info("{0} active clients found.".format(len(devices)))
 
-    # CALCULATE STATIC IP
-    # TODO:  set rules for address change (out of DHCPCD range)
-    logging.info("Calculating for a static IP.")
+    # SELECT STATIC IP
+    # TODO: Try to get DHCP to be sure.
+    logging.info("Selecting an unused static IP.")
     for host in config["subnet"].hosts():
         if host not in devices:
             config["static_ip"] = host
             break
 
-    logging.info("Static IP calculated: {0}".format(config["static_ip"]))
+    logging.info("Static IP selected: {0}".format(config["static_ip"]))
     # SET STATIC IP
-    logging.info("Changing to static IP address configuration.")
+    logging.info("Changing DHCP Client Daemon to static IP address configuration.")
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
-    logging.debug("Saved original dhcpcd configuration with suffix '.original'.")
+    logging.debug("Saved original dhcpcd.conf with suffix '.original'.")
     with open(DHCPCD_CONF, "a") as dhcpcd_conf:
         static_conf = "\n# Static IPv4 configuration for dns-firewall \n" \
                       "interface eth0 \n" \
@@ -104,7 +109,7 @@ def install() -> None:
                       "static routers={1} \n" \
                       "static domain_name_servers={0} \n".format(config["static_ip"], config["router"])
         dhcpcd_conf.write(static_conf)
-    logging.debug("Appended static configuration in dhcpcd.conf file.")
+    logging.debug("Appended static configuration to dhcpcd.conf file.")
 
     # TODO: Need reboot to get effective.
 

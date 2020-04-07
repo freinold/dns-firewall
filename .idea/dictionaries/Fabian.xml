@@ -2,6 +2,7 @@
   <dictionary name="Fabian">
     <words>
       <w>asctime</w>
+      <w>dhcp</w>
       <w>dhcpcd</w>
       <w>dnsutils</w>
       <w>levelname</w>
