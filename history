@@ -49,13 +49,13 @@
    49  ifconfig
    50  sudo apt update
    51  sudo apt upgrade
-   52  sudo less /etc/wpa_supplicant/wpa_supplicant.conf
+   52  sudo less /etc/wpa_supplicant/wpa_supplicant.conf 
    53  cd /etc/wpa_supplicant/
    54  ll
    55  ls -la
-   56  sudo less /etc/wpa_supplicant/wpa_supplicant.conf
-   57  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-   58  sudo service networking restart
+   56  sudo less /etc/wpa_supplicant/wpa_supplicant.conf 
+   57  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf 
+   58  sudo service networking restart 
    59  ifconfig
    60  sudo reboot
    61  sudo apt install neofetch
@@ -66,19 +66,19 @@
    66  pinentry
    67  sudo apt install python3-gpiozero
    68  pinout .
-   69  pinout
+   69  pinout 
    70  uname -r
-   71  less /etc/dhcpcd.conf
+   71  less /etc/dhcpcd.conf 
    72  man dhcpcd.conf
    73  man cp
    74  cp /etc/dhcpcd.conf /etc/dhcpcd.conf.original
    75  sudo cp /etc/dhcpcd.conf /etc/dhcpcd.conf.original
    76  cd /etc/
    77  ls -la
-   78  cd
+   78  cd 
    79  ls -la
    80  nano .bash_aliases
-   81  source .bashrc
+   81  source .bashrc 
    82  ll
    83  less .bashrc
    84  pwd
@@ -94,22 +94,22 @@
    94  uname -p
    95  neofetch
    96  sudo shutdown now
-   97  sudo raspi-config
-   98  less /boot/config.txt
-   99  nano /boot/config.txt
-  100  sudo nano /boot/config.txt
+   97  sudo raspi-config 
+   98  less /boot/config.txt 
+   99  nano /boot/config.txt 
+  100  sudo nano /boot/config.txt 
   101  history
   102  sudo -s
-  103  sudo less /etc/hostname
+  103  sudo less /etc/hostname 
   104  sudo less /etc/hosts
   105  sudo cat dns-fw > /etc/hostname
-  106  sudo less /etc/hostname
-  107  sudo raspi-config
+  106  sudo less /etc/hostname 
+  107  sudo raspi-config 
   108  ifconfig
   109  sa update
   110  sa upgrade
   111  history
-  112  sudo raspi-config
+  112  sudo raspi-config 
   113  sudo apt update
   114  man apt
   115  fw@dns-firewall:~ $ sudo raspi-config
@@ -131,13 +131,13 @@
   131  ip route get 8.8.8.8
   132  route=$(ip route get 8.8.8.8)route=$(ip route get 8.8.8.8)    route=$(ip route get 8.8.8.8)
   133  $route
-  134  cat $route
-  135  printf $route
-  136  echo $route
+  134  cat $route 
+  135  printf $route 
+  136  echo $route 
   137  sudo apt list
   138  apt list
   139  apt list > apt_packages_20200321
-  140  less apt_packages_20200321
+  140  less apt_packages_20200321 
   141  apt list --installed > apt_packages_20200321
   142  apt list --installed
   143  clear
@@ -155,16 +155,16 @@
   155  command -v less
   156  command -v less >/dev/null 2>&1
   157  command -v less >/dev/null
-  158  command -v less
+  158  command -v less 
   159  command -v apt
   160  ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1
   161  ip --oneline link show up
-  162  ip --oneline link show up | grep -v "lo"
-  163  man grep
-  164  ip --oneline link show up | grep -v "lo" | awk '{print $2}'
+  162  ip --oneline link show up | grep -v "lo" 
+  163  man grep 
+  164  ip --oneline link show up | grep -v "lo" | awk '{print $2}' 
   165  ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1
-  166  ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1
-  167  sudo nano /boot/config.txt
+  166  ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1 
+  167  sudo nano /boot/config.txt 
   168  sudo shutdown now
   169  exit
   170  clear
@@ -201,24 +201,24 @@
   201  cd /etc/bind/
   202  ll
   203  sudo nano named.conf
-  204  sudo nano named.conf.options
-  205  sudo nano named.conf.local
+  204  sudo nano named.conf.options 
+  205  sudo nano named.conf.local 
   206  sa install bind9-docs
   207  sa install bind9-doc
   208  history
   209  man apt install
-  210  man apt-get
+  210  man apt-get 
   211  sudo apt install bind9 bind9-doc bind9utils dnsutils -y
   212  sudo crontab -l
   213  crontab -l
-  214  less /etc/crontab
+  214  less /etc/crontab 
   215  exit
   216  cd /etc/bind/
   217  ll
-  218  sudo nano named.conf.options
-  219  sudo named-checkconf
-  220  sudo nano named.conf.options
-  221  sudo named-checkconf
+  218  sudo nano named.conf.options 
+  219  sudo named-checkconf 
+  220  sudo nano named.conf.options 
+  221  sudo named-checkconf 
   222  sudo service restart bind9
   223  sudo service start bind9
   224  sudo systemctl restart bind9
@@ -247,18 +247,18 @@
   247  sudo nano /etc/dhcpcd.conf
   248  sudo service networking restart
   249  less /etc/resolv.conf
-  250  resolvconf
+  250  resolvconf 
   251  cd /etc/
   252  ls -la resolv
-  253  ls -la
-  254  less resolvconf.conf
+  253  ls -la 
+  254  less resolvconf.conf 
   255  less resolv.conf
   256  sudo reboot
   257  sudo journalctl -u bind9 -f
   258  man journalctl
   259  cd /etc/bind/
   260  ll
-  261  less named.conf.options
+  261  less named.conf.options 
   262  ifconfig
   263  ip r
   264  which dhcpcd
@@ -278,35 +278,35 @@
   278  ..
   279  cd ..
   280  ls -la
-  281  cat resolvconf.conf
+  281  cat resolvconf.conf 
   282  cat /etc/resolv.conf
   283  dig hm.edu
   284  sudo reboot
   285  cd /etc/bind/
   286  ll
-  287  sudo nano named.conf.local
-  288  sudo less named.conf.default-zones
-  289  sudo less named.conf.options
-  290  sudo less zones.rfc1918
-  291  sudo less db.0
-  292  sudo less db.local
-  293  sudo less named.conf.default-zones
-  294  sudo nano named.conf.options
+  287  sudo nano named.conf.local 
+  288  sudo less named.conf.default-zones 
+  289  sudo less named.conf.options 
+  290  sudo less zones.rfc1918 
+  291  sudo less db.0 
+  292  sudo less db.local 
+  293  sudo less named.conf.default-zones 
+  294  sudo nano named.conf.options 
   295  sudo nano db.blocked
   296  fg
   297  ll
   298  less named.conf
-  299  sudo nano named.conf.local
-  300  less named.conf.default-zones
-  301  sudo nano named.conf.local
-  302  sudo nano named.conf.options
-  303  sudo nano named.conf.local
-  304  sudo named-checkconf
+  299  sudo nano named.conf.local 
+  300  less named.conf.default-zones 
+  301  sudo nano named.conf.local 
+  302  sudo nano named.conf.options 
+  303  sudo nano named.conf.local 
+  304  sudo named-checkconf 
   305  sudo systemctl bind9 restart
   306  sudo systemctl bind restart
   307  history | grep systemctl
   308  sudo systemctl restart bind9
-  309  less db.blocked
+  309  less db.blocked 
   310  dig hm.edu
   311  # doesnt work yet
   312  history
@@ -316,9 +316,9 @@
   316  sudo service bind9 status
   317  cd /etc/bind
   318  ll
-  319  sudo nano db.blocked
+  319  sudo nano db.blocked 
   320  less db.0
-  321  less db.local
+  321  less db.local 
   322  clear
   323  sudo service bind9 status
   324  neofetch
@@ -327,14 +327,261 @@
   327  neofetch
   328  sa install openssh-server
   329  exit
-  330  sudo nano /etc/sudoers.d/010_pi-nopasswd
-  331  sudo nano /etc/ssh/sshd_config
+  330  sudo nano /etc/sudoers.d/010_pi-nopasswd 
+  331  sudo nano /etc/ssh/sshd_config 
   332  exit
   333  ll
   334  cd .ssh/
   335  ll
-  336  cat authorized_keys
+  336  cat authorized_keys 
   337  exit
   338  python
   339  python3
   340  history
+  341  history | grep ctl
+  342  ll /etc/bind
+  343  man cp
+  344  sudo cp db.blocked rpz.block
+  345  cd /etc/bind
+  346  sudo cp db.blocked rpz.block
+  347  ll
+  348  sudo nano named.conf.options 
+  349  sudo nano named.conf.local 
+  350  ll
+  351  sudo named-checkconf 
+  352  sudo service restart bind9
+  353  sudo systemctl restart bind9
+  354  sudo journalctl -u bind9 -f
+  355  sudo python3
+  356  /bin/bash
+  357  /bin/bash echo $0
+  358  /bin/bash "echo $0"
+  359  which /bin/bash
+  360  man bash
+  361  $0
+  362  echo $0
+  363  which /bin/sh
+  364  sh
+  365  env
+  366  sudo python3
+  367  ll
+  368  ..
+  369  cd ..
+  370  ll
+  371  less dhcpcd.conf
+  372  less dhcpcd.conf.original 
+  373  man cp
+  374  less dhcpcd.conf
+  375  exit
+  376  nmap
+  377  nmap -sL
+  378  nmap -sL 192.168.178.0/24
+  379  ip a
+  380  nmap -sn 192.168.178.0/24
+  381  nmap -sL 192.168.178.0/24
+  382  nmap -sn 192.168.178.0/24
+  383  nmap -sn 192.168.178.0/24 --dns-servers 192.168.178.1
+  384  man nmap
+  385  nmap -sP -n 192.168.178.0/24
+  386  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1
+  387  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1 -v
+  388  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1 -T0
+  389  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1 -T2
+  390  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1 -T3
+  391  nmap -sP 192.168.178.0/24 --dns-servers 192.168.178.1 -T3
+  392  nmap -sP -n 192.168.178.0/24 --dns-servers 192.168.178.1 
+  393  nmap -sn -n 192.168.178.0/24 --dns-servers 192.168.178.1 
+  394  arp -a -n
+  395  nmap -Pn -n 192.168.178.0/24
+  396  nmap -Pn -sn 192.168.178.0/24
+  397  sudo nmap -sn -n 192.168.178.0/24
+  398  sudo nmap -sn -n 192.168.178.0/24 --dns-servers 192.168.178.1
+  399  sudo nmap -sn 192.168.178.0/24 --dns-servers 192.168.178.1
+  400  sudo nmap -sn -R 192.168.178.0/24 --dns-servers 192.168.178.1
+  401  sudo nmap -sn -n 192.168.178.0/24
+  402  ip a
+  403  man ip
+  404  ip addr
+  405  ip addr -4
+  406  ip -4
+  407  ip < -4
+  408  ip a -4
+  409  man ip
+  410  sudo python3
+  411  ip addr show eth0 | grep inet
+  412  ip addr show eth0 | grep "inet "
+  413  ip a show eth0
+  414  ip p
+  415  ip help
+  416  ip route 
+  417  hostname -i
+  418  ip addr show eth0 | grep "inet " | cut -f2
+  419  ip addr show eth0 | grep "inet " | cut -f1
+  420  ip addr show eth0 | grep "inet " | cut -f4
+  421  ip addr show eth0 | grep "inet " | cut -d. -f4
+  422  ip addr show eth0 | grep "inet " | cut -d  -f4
+  423  cut --help
+  424  ip addr show eth0 | grep "inet " | cut -d " " -f2
+  425  ip addr show eth0 | grep "inet " | cut -d " " -f1
+  426  ip addr show eth0 | grep "inet " | cut -d " " -f3
+  427  ip addr show eth0 | grep "inet " | cut -d " " 
+  428  ip addr show eth0 | grep "inet " | cut -d " " -f2
+  429  ip addr show eth0 | grep "inet " | cut -d ' ' -f2
+  430  ip addr show eth0 | grep "inet " | awk {print $2}
+  431  ip addr show eth0 | grep "inet " | awk "{print $2}"
+  432  ip addr show eth0 | grep "inet " | awk "{print $1}"
+  433  ip addr show eth0 | grep "inet " | awk '{print $1}'
+  434  ip addr show eth0 | grep "inet " | awk '{print $2}'
+  435  ip addr show eth0 | grep 'inet ' | awk '{print $2}'
+  436  ip route
+  437  ip addr show eth0 | grep "inet " 
+  438  ip addr show eth0 
+  439  ip route | awk '{print $1, $2}'
+  440  ip route | grep 'default' | awk '{print $1, $2}'
+  441  ip route | grep 'default' | awk '{print $3, $7}'
+  442  git
+  443  sa install git
+  444  git
+  445  git checkout https://github.com/freinold/dns-firewall.git
+  446  git checkout https://github.com/freinold/dns-firewall
+  447  git clone https://github.com/freinold/dns-firewall.git
+  448  mkdir .ssh
+  449  cd .ssh
+  450  ll
+  451  ssh-keygen
+  452  ll
+  453  less id_rsa.pub 
+  454  git clone git@github.com:freinold/dns-firewall.git
+  455  ll
+  456  rm -r dns-firewall/
+  457  cd 
+  458  git clone git@github.com:freinold/dns-firewall.git
+  459  ll
+  460  cd dns-firewall/
+  461  ll
+  462  sudo python3 main.py 
+  463  git pull
+  464  sudo python3 main.py 
+  465  sudo python3
+  466  git pull
+  467  sudo python3 main.py 
+  468  git pull
+  469  sudo python3 main.py 
+  470  cat /etc/dns-fw/log 
+  471  rmdir /etc/dns-fw/
+  472  sudo rmdir /etc/dns-fw/
+  473  ll /etc/dns-fw/
+  474  sudo rmdir /etc/dns-fw/ -r
+  475  sudo rm /etc/dns-fw/ -r
+  476  git pull
+  477  sudo python3 main.py 
+  478  git pull
+  479  sudo python3 main.py 
+  480  sudo rm /etc/dns-fw/ -r
+  481  sudo python3 main.py 
+  482  history
+  483  clean
+  484  clear
+  485  git pull
+  486  sudo rm /etc/dns-fw/ -r
+  487  sudo python3 main.py 
+  488  less /etc/dns-fw/log 
+  489  sudo less /etc/dns-fw/log 
+  490  sudo cat /etc/dns-fw/log 
+  491  git pull
+  492  sudo rm /etc/dns-fw/ -r
+  493  sudo python3 main.py 
+  494  sudo cat /etc/dns-fw/log 
+  495  man grep
+  496  ip route | grep -v 'default' | awk '{print $1, $2}'
+  497  ip route | grep -v 'default' | awk '{print $1}'
+  498  history
+  499  history > history.txt
+  500  git add history.txt 
+  501  git commit -m "History file"
+  502  git config user.email "fabian.reinold@web.de"
+  503  git config user.name "Fabian Reinold"
+  504  git config user.name 
+  505  git commit -m "History file"
+  506  git push
+  507  sudo nmap -sn -n 192.168.178.0/24
+  508  man
+  509  man nmap
+  510  sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2
+  511  sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | grep 'scan report'
+  512  sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | grep 'scan report' | awk '{print $5}'
+  513  git pull
+  514  sudo python3 main.py 
+  515  git pull
+  516  sudo python3 main.py 
+  517  git pull
+  518  sudo python3 main.py 
+  519  git pull
+  520  sudo python3 main.py 
+  521  git pull
+  522  sudo python3 main.py 
+  523  git pull
+  524  sudo python3 main.py 
+  525  git pull
+  526  sudo python3 main.py 
+  527  git pull
+  528  sudo python3 main.py 
+  529  git pull
+  530  sudo python3 main.py 
+  531  git pull
+  532  sudo python3 main.py 
+  533  git pull
+  534  sudo python3 main.py 
+  535  sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | grep 'scan report'
+  536  sudo nmap -sn -n 192.168.178.0/24 --exclude 192.168.178.2 | grep 'scan report' | awk '{print $5}'
+  537  git pull
+  538  sudo python3 main.py 
+  539  less /etc/dns-fw/log 
+  540  sudo less /etc/dns-fw/log 
+  541  nano main.py 
+  542  sudo python3 main.py 
+  543  sudo less /etc/dns-fw/log 
+  544  sudo rm /etc/dns-fw/log 
+  545  sudo python3 main.py 
+  546  sudo less /etc/dns-fw/log 
+  547  nano main.py 
+  548  sudo python3 main.py 
+  549  git commit -m "Fixed nmap error by stripping parameter of newline"
+  550  git add .
+  551  git commit -m "Fixed nmap error by stripping parameter of newline"
+  552  git push
+  553  git pull
+  554  sudo python3 main.py 
+  555  sudo less /etc/dns-fw/log 
+  556  git pull
+  557  sudo python3 main.py 
+  558  nano main.py 
+  559  sudo python3 main.py 
+  560  sudo less /etc/dns-fw/log 
+  561  sudo rm /etc/dns-fw/log 
+  562  sudo python3 main.py 
+  563  sudo less /etc/dns-fw/log 
+  564  sudo cat /etc/dns-fw/log 
+  565  less /etc/dhcpcd.conf
+  566  ll /etc
+  567  sudo rm /etc/dhcpcd.conf.original 
+  568  sudo nano /etc/dhcpcd.conf 
+  569  git pull
+  570  git diff
+  571  git add 
+  572  git add .
+  573  git commit  -m "Changed log level to INFO"
+  574  git push
+  575  git pull
+  576  git push
+  577  exit
+  578  cd dns-firewall/
+  579  cp /etc/dhcpcd.conf ./dhcpcd.conf
+  580  ll
+  581  nano dhcpcd.conf 
+  582* git pull 
+  583  sudo python3 main.py 
+  584  nano main.py 
+  585  sudo python3 main.py 
+  586  rm history history.txt 
+  587  history > history
