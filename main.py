@@ -36,12 +36,14 @@ def main() -> None:
 def configure_logs() -> None:
     if not os.path.isfile(LOG_FILE):
         os.mknod(LOG_FILE)
+    # noinspection PyArgumentList
     logging.basicConfig(
         datefmt="%Y-%m-%d %H:%M:%S",
         #filename=LOG_FILE,
         #filemode="w",
-        format="%(asctime)s - %(levelname)s: %(message)s",
+        format="{asctime} - {levelname:8}: {message}",
         level=logging.INFO,
+        style="{"
     )
     logging.info("DNS-FIREWALL started.")
 
@@ -55,7 +57,7 @@ def install() -> None:
         _bash("sudo apt update")
         _bash("sudo apt install {0} -y".format(" ".join(APT_PACKAGES)))
     except subprocess.CalledProcessError as error:
-        logging.error("Error installing required packages: %s \nAborting now.", error.stderr)
+        logging.error("Error installing required packages: {0} \nAborting now.".format(error.stderr))
         exit(-1)
 
     # GET SUBNET INFO
@@ -64,9 +66,10 @@ def install() -> None:
         output = _bash("ip route | grep 'default' | awk '{print $3, $7}'")
         config["router"], config["dynamic_ip"] = map(lambda x: ipaddress.ip_address(x), output.strip().split(" "))
         config["subnet"] = ipaddress.ip_network(_bash("ip route | grep -v 'default' | awk '{print $1}'").rstrip())
-        logging.info("IP-Address: %s, Router: %s, Subnet: %s", config["dynamic_ip"], config["router"], config["subnet"])
+        logging.info("IP-Address: {0}, Router: {1}, Subnet: {2}"
+                     .format(config["dynamic_ip"], config["router"], config["subnet"]))
     except subprocess.CalledProcessError as error:
-        logging.error("Error getting required local network information: %s\nAborting now.", error.stderr)
+        logging.error("Error getting required local network information: {0}\nAborting now.".format(error.stderr))
         exit(-1)
 
     # GET ACTIVE CLIENTS INFO
@@ -78,7 +81,7 @@ def install() -> None:
                        "awk '{{print $5}}'".format(config["subnet"], config["dynamic_ip"])).rstrip()
         devices = list(map(lambda x: ipaddress.ip_address(x), output.split("\n")))
     except subprocess.CalledProcessError as error:
-        logging.error("Error scanning local network: %s\nAborting now.", error.stderr)
+        logging.error("Error scanning local network: {0}\nAborting now.".format(error.stderr))
         exit(-1)
 
     # CALCULATE STATIC IP
@@ -106,8 +109,8 @@ def install() -> None:
 
 
 def _bash(cmd: str) -> str:
-    logging.debug("Bash Command: %s", cmd)
-    output = subprocess.run(
+    logging.debug("Bash Command: {0}".format(cmd))
+    output: str = subprocess.run(
         cmd,
         shell=True,
         check=True,
@@ -115,7 +118,7 @@ def _bash(cmd: str) -> str:
         capture_output=True,
         text=True
     ).stdout
-    logging.debug("Command Output: %s", output)
+    logging.debug("Command Output: {0}".format(output))
     return output
 
 
