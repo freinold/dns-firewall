@@ -92,12 +92,13 @@ def install() -> None:
             config["static_ip"] = host
             break
 
+    logging.info("Static IP calculated: {0}".format(config["static_ip"]))
     # SET STATIC IP
     logging.info("Changing to static IP address configuration.")
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
     logging.debug("Saved original dhcpcd configuration with suffix '.original'.")
     with open(DHCPCD_CONF, "a") as dhcpcd_conf:
-        static_conf = "# Static IPv4 configuration for dns-firewall \n" \
+        static_conf = "\n# Static IPv4 configuration for dns-firewall \n" \
                       "interface eth0 \n" \
                       "static ip_address={0} \n" \
                       "static routers={1} \n" \
