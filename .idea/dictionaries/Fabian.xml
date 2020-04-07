@@ -1,8 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="Fabian">
     <words>
+      <w>asctime</w>
       <w>dhcpcd</w>
       <w>dnsutils</w>
+      <w>levelname</w>
+      <w>nmap</w>
     </words>
   </dictionary>
 </component>

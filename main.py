@@ -11,17 +11,6 @@ LOG_FILE = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
 APT_PACKAGES = ["bind9", "bind9utils", "dnsutils", "nmap"]
 
-LOGO_OLD = '''\033[33m
-  (         )  (         (     (    (                           (     (     
-  )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      (  (       (      )\ )  )\ )  
- (()/(   )\())(()/(     (()/( (()/((()/( (    )\))(   '  )\    (()/( (()/(  
-\033[91m  /(_)) ((_)\  /(_))     /(_)) /(_))/(_)))\ \033[33m ((_)()\ )((((_)( \033[91m  /(_)) /(_)) 
- (_))_   _((_)(_))      (_))_|(_)) (_)) ((_) _(())\_)())\ _ )\ (_))  (_))   \033[31m
-  |   \ | \| |/ __| ___ | |_  |_ _|| _ \| __|\ \\\033[91m((_)\033[31m/ /\033[91m(_)\033[31m_\\\033[91m(_)\033[31m| |   | |    
-  | |) || .` |\__ \|___|| __|  | | |   /| _|  \ \/\/ /  / _ \  | |__ | |__  
-  |___/ |_|\_||___/     |_|   |___||_|_\|___|  \_/\_/  /_/ \_\ |____||____| 
-  \033[0m'''
-
 LOGO = '''\033[33m
   (         )  (         (     (    (         (  (       (      (     (     
   )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      )\))(   '  )\     )\ )  )\ )  
@@ -49,7 +38,8 @@ def configure_logs() -> None:
         os.mknod(LOG_FILE)
     logging.basicConfig(
         datefmt="%Y-%m-%d %H:%M:%S",
-        filename=LOG_FILE,
+        #filename=LOG_FILE,
+        #filemode="w",
         format="%(asctime)s - %(levelname)s: %(message)s",
         level=logging.INFO,
     )
@@ -58,6 +48,7 @@ def configure_logs() -> None:
 
 def install() -> None:
     config = {}
+
     # DOWNLOAD PACKAGES
     logging.info("Downloading all required packages.")
     try:
