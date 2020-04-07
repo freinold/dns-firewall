@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 
-DHCPCD_CONF = "/dns-fw/dhcpcd.conf"
+DHCPCD_CONF = "~/dns-firewall/dhcpcd.conf"
 DIR = "/etc/dns-fw"
 LOG_FILE = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
