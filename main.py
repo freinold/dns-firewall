@@ -73,7 +73,7 @@ def install() -> None:
         output = _bash("ip route | "
                        "grep 'default' | "
                        "awk '{print $3, $7}'")
-        config["dynamic_ip"], config["router"] = output.split(" ")
+        config["dynamic_ip"], config["router"] = output.rstrip().split(" ")
         config["subnet"] = _bash("ip route | "
                                  "grep -v 'default' | "
                                  "awk '{print $1}'").rstrip()
@@ -88,7 +88,7 @@ def install() -> None:
     try:
         output = _bash("sudo nmap -sn -n {0} --exclude {1} | "
                        "grep 'scan report' | "
-                       "awk '{{print $5}}'".format(config["subnet"], config["dynamic_ip"]))
+                       "awk '{{print $5}}'".format(config["subnet"], config["dynamic_ip"])).rstrip()
         print(output)
         devices = list(map(lambda x: ipaddress.ip_address(x), output.split("\n")))
         print(devices)
