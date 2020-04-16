@@ -12,7 +12,7 @@ $TTL 1H
 with open("providers.list") as p:
     providers = p.readlines()
 
-ips = set()
+ips = {}
 
 with open("rpz", "w") as rpz:
     rpz.write(HEADER.format(datetime.datetime.now().strftime("%Y%m%d%H%M")))
@@ -26,7 +26,13 @@ with open("rpz", "w") as rpz:
 
             parts = domain.split(" ")
             if len(parts) == 2:
-                ips.add(domain.split(" ")[0].rstrip())
+                # Only to see if we got the right ones
+                ip = parts[0].rstrip()
+                if ip not in ips:
+                    ips[ip] = 1
+                else:
+                    ips[ip] += 1
+
                 if parts[0].startswith("0.0.0.0") or parts[0].startswith("127.0.0.1"):
                     domain = parts[1]
                 else:
