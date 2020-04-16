@@ -15,7 +15,7 @@ with open("providers.list") as p:
 ips = {}
 
 with open("rpz", "w") as rpz:
-    rpz.write(HEADER.format(datetime.datetime.now().strftime("%Y%m%d%H%M")))
+    rpz.write(HEADER.format(datetime.datetime.now().strftime("%Y%m%d%H")))
     for provider in providers:
         rpz.write("\n; "+provider)
         domains = requests.get(provider.rstrip()).iter_lines()
