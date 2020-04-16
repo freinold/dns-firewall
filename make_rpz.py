@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+import requests
+import datetime
+
+HEADER = '''; zone file rpz
+$TTL 1H
+@                       SOA LOCALHOST. named-mgr.example.com ({0} 1h 15m 30d 2h)
+                        NS  LOCALHOST.
+; begin RPZ RR definitions
+'''
+
+with open("providers.list") as p:
+    providers = p.readlines()
+
+ips = set()
+
+with open("rpz", "w") as rpz:
+    rpz.write(HEADER.format(datetime.datetime.now().strftime("%Y%m%d%H%M")))
+    for provider in providers:
+        rpz.write("\n; "+provider)
+        domains = requests.get(provider.rstrip()).iter_lines()
+        for domain in domains:
+            domain = str(domain, "utf-8").rstrip()
+            if domain.startswith("#") or len(domain) == 0:
+                continue
+
+            parts = domain.split(" ")
+            if len(parts) == 2:
+                ips.add(domain.split(" ")[0].rstrip())
+                if parts[0].startswith("0.0.0.0") or parts[0].startswith("127.0.0.1"):
+                    domain = parts[1]
+                else:
+                    continue
+
+            domain = domain.split("#")[0]  # Before comment
+            domain += "        CNAME . \n"
+            rpz.write(domain)
+            rpz.write("*." + domain)
+
+print(ips)
