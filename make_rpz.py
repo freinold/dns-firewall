@@ -20,12 +20,12 @@ with open("rpz", "w") as rpz:
         rpz.write("\n; "+provider)
         domains = requests.get(provider.rstrip()).iter_lines()
         for domain in domains:
-            domain = str(domain, "utf-8").rstrip()
+            domain = str(domain, "utf-8").strip()
             if domain.startswith("#") or len(domain) == 0:
                 continue
 
             parts = domain.split(" ")
-            if len(parts) == 2:
+            if len(parts) >= 2:
                 # Only to see if we got the right ones
                 ip = parts[0].rstrip()
                 if ip not in ips:
