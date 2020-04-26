@@ -1,0 +1,26 @@
+acl trusted {
+        {0};
+        localhost;
+        localnets;
+};
+
+options {
+        directory "/var/cache/bind";
+
+        recursion yes;
+        allow-query { trusted; };
+
+        forwarders {
+                9.9.9.9;          # Quad9
+                149.112.112.112;  # Quad9 Backup
+        };
+        forward only;
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+
+        auth-nxdomain no;  # Needed for conformity to RFC1035
+        listen-on-v6 { any; };
+
+        response-policy { zone "rpz"; } break-dnssec yes qname-wait-recurse no;
+};

@@ -6,7 +6,10 @@
       <w>dhcpcd</w>
       <w>dnsutils</w>
       <w>levelname</w>
+      <w>nameserver</w>
       <w>nmap</w>
+      <w>resolv</w>
+      <w>reusability</w>
       <w>systemctl</w>
     </words>
   </dictionary>
