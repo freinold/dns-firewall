@@ -4,10 +4,13 @@
       <w>asctime</w>
       <w>dhcp</w>
       <w>dhcpcd</w>
+      <w>dnssec</w>
       <w>dnsutils</w>
       <w>levelname</w>
+      <w>localnets</w>
       <w>nameserver</w>
       <w>nmap</w>
+      <w>nxdomain</w>
       <w>resolv</w>
       <w>reusability</w>
       <w>systemctl</w>

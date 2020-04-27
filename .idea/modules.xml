@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/dns-firewall.iml" filepath="$PROJECT_DIR$/.idea/dns-firewall.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/pi-baseclient/.idea/pi-baseclient.iml" filepath="$USER_HOME$/PycharmProjects/pi-baseclient/.idea/pi-baseclient.iml" />
       <module fileurl="file://$PROJECT_DIR$/../rpz-server/.idea/rpz-server.iml" filepath="$PROJECT_DIR$/../rpz-server/.idea/rpz-server.iml" />
     </modules>
   </component>

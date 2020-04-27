@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import logging
 import os
+import shutil
 import subprocess
 import time
 
-import bash
-import static_ip
+import pi_baseclient.bash as bash
+import pi_baseclient.static_ip as static_ip
 
 APT_PACKAGES = ["bind9", "bind9utils", "dnsutils", "nmap"]
 
@@ -14,9 +15,10 @@ LOG = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
 
 BIND_DIR = "/etc/bind"
-NAMED_CONF = BIND_DIR + "/named.conf"
-NAMED_CONF_OPTIONS = BIND_DIR + "/named.conf.options"
-NAMED_CONF_LOCAL = BIND_DIR + "/named.conf.local"
+NAMED_CONF_OPTIONS = os.path.join(BIND_DIR, "named.conf.options")
+NAMED_CONF_LOCAL = os.path.join(BIND_DIR, "named.conf.local")
+
+CUSTOM_NAMED_CONF_DIR = "resources/named_configuration"
 
 LOGO = '''\033[33m
   (         )  (         (     (    (         (  (       (      (     (     
@@ -27,17 +29,6 @@ LOGO = '''\033[33m
   |   \ | \| |/ __| ___ | |_  |_ _|| _ \| __|\ \    / /  /_\   | |   | |    
   | |) || .` |\__ \|___|| __|  | | |   /| _|  \ \/\/ /  / _ \  | |__ | |__  
   |___/ |_|\_||___/     |_|   |___||_|_\|___|  \_/\_/  /_/ \_\ |____||____| \033[0m'''
-
-CUSTOM_BIND_CONFIG='''
-
-'''
-
-ZONE_LOCAL='''
-zone "{0}" IN {
-        type forward;
-        forwarders { {1}; };
-        forward only;
-'''
 
 
 def main() -> None:
@@ -101,17 +92,26 @@ def install() -> None:
         router_name = ""
 
     # ADD CUSTOM BIND CONFIGURATION
-    with open(NAMED_CONF_OPTIONS, "w") as named_conf_options:
-        named_conf_options.write(CUSTOM_BIND_CONFIG.format(info["subnet"]))
-
-    # USE OLD RESOLVER (MOST PROBABLY ROUTER) TO RESOLVE LOCAL SUBNET
-    if len(router_name) > 0:
-        with open(NAMED_CONF_LOCAL, "w") as named_conf_local:
-            named_conf_local.write(ZONE_LOCAL.format(router_name, info["original_resolver"]))
+    for file in os.listdir(CUSTOM_NAMED_CONF_DIR):
+        custom_path = os.path.join(CUSTOM_NAMED_CONF_DIR, file)
+        bind_path = os.path.join(BIND_DIR, file)
+        copy_path = os.path.join(BIND_DIR, file + ".original")
+        shutil.move(bind_path, copy_path)
+        with open(custom_path) as custom_conf:
+            content = custom_conf.read()
+        
+        if "options" in file:
+            content = content.replace("{SUBNET}", info["subnet"])
+        elif "local" in file and len(router_name) > 0:
+            content = content.replace("//", "").replace("{ROUTER_NAME}", router_name)\
+                .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
+        
+        with open(bind_path, "w") as conf:
+            conf.write(content)
 
     # CHECK CONFIGURATION
     try:
-        output = bash.call("sudo named-checkconf -f {0}".format(NAMED_CONF))
+        output = bash.call("sudo named-checkconf")
         if output != "":
             logging.critical("BIND9 config is corrupted:\n"
                              "{0}\n"

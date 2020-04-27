@@ -1,4 +1,0 @@
-zone "rpz"{
-        type master;
-        file "/etc/bind/rpz";
-};

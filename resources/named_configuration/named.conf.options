@@ -1,5 +1,5 @@
 acl trusted {
-        {0};
+        {SUBNET};
         localhost;
         localnets;
 };
