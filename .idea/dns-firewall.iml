@@ -7,7 +7,9 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (dns-firewall)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="rpz-server" />
     <orderEntry type="module" module-name="pi-baseclient" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="removeUnused" value="true" />
   </component>
 </module>
