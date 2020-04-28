@@ -14,11 +14,8 @@ DIR = "/etc/dns-fw"
 LOG = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
 
-BIND_DIR = "/etc/bind"
-NAMED_CONF_OPTIONS = os.path.join(BIND_DIR, "named.conf.options")
-NAMED_CONF_LOCAL = os.path.join(BIND_DIR, "named.conf.local")
-
-CUSTOM_NAMED_CONF_DIR = "resources/named_configuration"
+NAMED_CONF = "/etc/bind/named.conf"
+CUSTOM_NAMED_CONF = "../resources/named.conf"
 
 LOGO = '''\033[33m
   (         )  (         (     (    (         (  (       (      (     (     
@@ -35,7 +32,7 @@ def main() -> None:
     # print(LOGO)
     os.makedirs(DIR, exist_ok=True)
     configure_logs()
-    # Check if dns-firewall is already installed
+    # Check if dns_firewall is already installed
     is_installed: bool = os.path.isfile(FW_CONF)
     if not is_installed:
         logging.warning("Software not installed. Starting installation now.")
@@ -92,22 +89,16 @@ def install() -> None:
         router_name = ""
 
     # ADD CUSTOM BIND CONFIGURATION
-    for file in os.listdir(CUSTOM_NAMED_CONF_DIR):
-        custom_path = os.path.join(CUSTOM_NAMED_CONF_DIR, file)
-        bind_path = os.path.join(BIND_DIR, file)
-        copy_path = os.path.join(BIND_DIR, file + ".original")
-        shutil.move(bind_path, copy_path)
-        with open(custom_path) as custom_conf:
-            content = custom_conf.read()
-        
-        if "options" in file:
-            content = content.replace("{SUBNET}", info["subnet"])
-        elif "local" in file and len(router_name) > 0:
-            content = content.replace("//", "").replace("{ROUTER_NAME}", router_name)\
-                .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
-        
-        with open(bind_path, "w") as conf:
-            conf.write(content)
+    shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
+    with open(CUSTOM_NAMED_CONF) as file:
+        custom_named_conf = file.read()
+    custom_named_conf = custom_named_conf\
+        .replace("//", "") \
+        .replace("{SUBNET}", info["subnet"])\
+        .replace("{ROUTER_NAME}", router_name)\
+        .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
+    with open(NAMED_CONF, "w") as file:
+        file.write(custom_named_conf)
 
     # CHECK CONFIGURATION
     try:
@@ -133,16 +124,6 @@ def install() -> None:
 
 
 def load() -> None:
-    # UPDATE PACKAGES
-    logging.info("Updating necessary packages.")
-    try:
-        bash.call("sudo apt update")
-        bash.call("sudo apt upgrade")
-    except subprocess.CalledProcessError as error:
-        logging.error("Error updating packages: {0}\nIf used packages are outdated, there could be vulnerabilities.")
-    finally:
-        logging.info("Package update finished.")
-
     # LOAD NAMED CONFIG
     # TODO: Implement loading of config from server / pre loaded files.
     # RESTART BIND9
