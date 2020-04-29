@@ -55,7 +55,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
             exit(-1)
         finally:
             logging.info("Gathered information:\n"
-                         "IP-Address: {original_ip]},\n"
+                         "IP-Address: {original_ip},\n"
                          "Router: {router},\n"
                          "Subnet: {subnet},\n"
                          "Resolver: {original_resolver}".format(**info))
