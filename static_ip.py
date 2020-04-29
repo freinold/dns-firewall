@@ -5,7 +5,7 @@ import logging  # TODO: Handle logging from different modules.
 import os.path
 import shutil
 
-import pi_baseclient.bash as bash
+import bash
 
 DHCPCD_CONF = "/etc/dhcpcd.conf"  # TODO: Changed for tests!
 DHCPCD_CONF_COPY = DHCPCD_CONF + ".original"
