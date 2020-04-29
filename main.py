@@ -3,10 +3,14 @@ import logging
 import os
 import shutil
 import subprocess
+
 import time
 
-import pi_baseclient.bash as bash
-import pi_baseclient.static_ip as static_ip
+import bash
+import static_ip
+
+# import pi_baseclient.bash as bash
+# import pi_baseclient.static_ip as static_ip
 
 APT_PACKAGES = ["bind9", "bind9utils", "dnsutils", "nmap"]
 
