@@ -88,6 +88,8 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         info["resolver"] = info["static_ip"] if self_as_resolver else info["original_resolver"]
 
         # WRITE INFO TO FILE FOR OTHERS TO USE
+        for key, item in info.items():
+            info[key] = item.exploded
         with open(INFO_FILE, "w") as info_file:
             json.dump(info, info_file)
 

@@ -21,6 +21,14 @@ FW_CONF = DIR + "/fw.conf"
 NAMED_CONF = "/etc/bind/named.conf"
 CUSTOM_NAMED_CONF = "../resources/named.conf"
 
+ZONE_TEMPLATE = '''
+zone "{0}" {{
+        type slave;
+        masters {{ 129.187.208.46; }}
+        file "{0}";
+}};
+'''
+
 LOGO = '''\033[33m
   (         )  (         (     (    (         (  (       (      (     (     
   )\ )   ( /(  )\ )      )\ )  )\ ) )\ )      )\))(   '  )\     )\ )  )\ )  
@@ -92,15 +100,20 @@ def install() -> None:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
         router_name = ""
 
+    # MANUAL CONFIG OF ZONES & POLICIES FOR TESTING
+    policies = 'zone "db.passthru"; zone "db.combination.31"; zone "db.ip";'
+    zones = ZONE_TEMPLATE.format("db.combination.31") + ZONE_TEMPLATE.format("db.ip")
+
     # ADD CUSTOM BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
     with open(CUSTOM_NAMED_CONF) as file:
         custom_named_conf = file.read()
-    custom_named_conf = custom_named_conf\
-        .replace("//", "") \
-        .replace("{SUBNET}", info["subnet"])\
-        .replace("{ROUTER_NAME}", router_name)\
-        .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
+        custom_named_conf = custom_named_conf \
+            .replace("{SUBNET}", info["subnet"]).replace("{POLICIES}", policies).replace("{ZONES}", zones)
+        if len(router_name) > 0:
+            custom_named_conf = custom_named_conf \
+                .replace("{ROUTER_NAME}", router_name) \
+                .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
     with open(NAMED_CONF, "w") as file:
         file.write(custom_named_conf)
 
