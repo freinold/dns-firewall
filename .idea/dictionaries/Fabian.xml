@@ -12,6 +12,7 @@
       <w>nameserver</w>
       <w>nmap</w>
       <w>nxdomain</w>
+      <w>passthru</w>
       <w>resolv</w>
       <w>reusability</w>
       <w>systemctl</w>

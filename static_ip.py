@@ -24,31 +24,31 @@ static domain_name_servers={2}
 class Info:
     def __init__(self, filename=None):
         if filename is None:
-            self.router = None
-            self.subnet = None
-            self.original_ip = None
-            self.original_resolver = None
-            self.static_ip = None
-            self.resolver = None
+            self.router: ipaddress.IPv4Address = ipaddress.IPv4Address("")
+            self.subnet: ipaddress.IPv4Network = ipaddress.IPv4Network("")
+            self.original_ip: ipaddress.IPv4Address = ipaddress.IPv4Address("")
+            self.original_resolver: ipaddress.IPv4Address = ipaddress.IPv4Address("")
+            self.static_ip: ipaddress.IPv4Address = ipaddress.IPv4Address("")
+            self.resolver: ipaddress.IPv4Address = ipaddress.IPv4Address("")
         else:
             with open(filename) as file:
                 info = json.load(file)
-            self.router = ipaddress.ip_address(info["router"])
-            self.subnet = ipaddress.ip_network(info["subnet"])
-            self.original_ip = ipaddress.ip_address(info["original_ip"])
-            self.original_resolver = ipaddress.ip_address(info["original_resolver"])
-            self.static_ip = ipaddress.ip_address(info["static_ip"])
-            self.resolver = ipaddress.ip_address(info["resolver"])
+            self.router = ipaddress.IPv4Address(info["router"])
+            self.subnet = ipaddress.IPv4Network(info["subnet"])
+            self.original_ip = ipaddress.IPv4Address(info["original_ip"])
+            self.original_resolver = ipaddress.IPv4Address(info["original_resolver"])
+            self.static_ip = ipaddress.IPv4Address(info["static_ip"])
+            self.resolver = ipaddress.IPv4Address(info["resolver"])
 
     def save(self, filename):
         with open(filename, "w") as file:
             json.dump({
-                "router": self.router,
-                "subnet": self.subnet,
-                "original_ip": self.original_ip,
-                "original_resolver": self.original_resolver,
-                "static_ip": self.static_ip,
-                "resolver": self.resolver
+                "router": self.router.exploded,
+                "subnet": self.subnet.exploded,
+                "original_ip": self.original_ip.exploded,
+                "original_resolver": self.original_resolver.exploded,
+                "static_ip": self.static_ip.exploded,
+                "resolver": self.resolver.exploded
             }, file)
 
 
@@ -69,13 +69,13 @@ def configure(use_info=False, self_as_resolver=False) -> None:
             output = bash.call("ip route | "
                                "grep 'default' | "
                                "awk '{print $3, $7}'")
-            info.router, info.original_ip = map(lambda x: ipaddress.ip_address(x), output.strip().split(" "))
-            info.subnet = ipaddress.ip_network(bash.call("ip route | "
-                                                         "grep -v 'default' | "
-                                                         "awk '{print $1}'").rstrip())
-            info.original_resolver = ipaddress.ip_address(bash.call("cat /etc/resolv.conf | "
-                                                                    "grep -m 1 'nameserver' | "
-                                                                    "awk '{print $2}'").rstrip())
+            info.router, info.original_ip = map(lambda x: ipaddress.IPv4Address(x), output.strip().split(" "))
+            info.subnet = ipaddress.IPv4Network(bash.call("ip route | "
+                                                          "grep -v 'default' | "
+                                                          "awk '{print $1}'").rstrip())
+            info.original_resolver = ipaddress.IPv4Address(bash.call("cat /etc/resolv.conf | "
+                                                                     "grep -m 1 'nameserver' | "
+                                                                     "awk '{print $2}'").rstrip())
         except bash.CallError as error:
             logging.critical(
                 "Critical error getting required local network information: {0}\n"
@@ -95,7 +95,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
             output = bash.call("sudo nmap -sn -n {0} --exclude {1} | "
                                "grep 'scan report' | "
                                "awk '{{print $5}}'".format(info.subnet, info.original_ip)).rstrip()
-            devices = list(map(lambda x: ipaddress.ip_address(x), output.split("\n")))
+            devices = list(map(lambda x: ipaddress.IPv4Address(x), output.split("\n")))
         except bash.CallError as error:
             logging.error("Error scanning local network: {0}\n"
                           "Errors configuring static IP are possible.".format(error))
