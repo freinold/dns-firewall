@@ -19,7 +19,7 @@ LOG = DIR + "/log"
 FW_CONF = DIR + "/fw.conf"
 
 NAMED_CONF = "/etc/bind/named.conf"
-CUSTOM_NAMED_CONF = "../resources/named.conf"
+CUSTOM_NAMED_CONF = "resources/named.conf"
 
 ZONE_TEMPLATE = '''
 zone "{0}" {{
