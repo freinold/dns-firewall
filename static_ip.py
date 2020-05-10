@@ -23,14 +23,13 @@ static domain_name_servers={2}
 
 class Info:
     def __init__(self, filename=None):
-        if filename is None:
-            self.router: ipaddress.IPv4Address = ipaddress.IPv4Address("")
-            self.subnet: ipaddress.IPv4Network = ipaddress.IPv4Network("")
-            self.original_ip: ipaddress.IPv4Address = ipaddress.IPv4Address("")
-            self.original_resolver: ipaddress.IPv4Address = ipaddress.IPv4Address("")
-            self.static_ip: ipaddress.IPv4Address = ipaddress.IPv4Address("")
-            self.resolver: ipaddress.IPv4Address = ipaddress.IPv4Address("")
-        else:
+        self.router: ipaddress.IPv4Address
+        self.subnet: ipaddress.IPv4Network
+        self.original_ip: ipaddress.IPv4Address
+        self.original_resolver: ipaddress.IPv4Address
+        self.static_ip: ipaddress.IPv4Address
+        self.resolver: ipaddress.IPv4Address
+        if filename is not None:
             with open(filename) as file:
                 info = json.load(file)
             self.router = ipaddress.IPv4Address(info["router"])
