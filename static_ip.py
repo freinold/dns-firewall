@@ -13,7 +13,7 @@ INFO_FILE = "/etc/dns-fw/static_ip.info.json"
 NET_DIRECTORY = "/sys/class/net"
 
 STATIC_DHCPCD_CONF = '''
-# Static IPv4 configuration for dns-firewall
+# Static IPv4 configuration, provided by python3 script static_ip.py
 interface eth0
 static ip_address={0}
 static routers={1}
@@ -81,11 +81,11 @@ def configure(use_info=False, self_as_resolver=False) -> None:
                 "Aborting now.".format(error))
             exit(-1)
         finally:
-            logging.info("\t\tGathered information:\n"
-                         "\t\tIP-Address: {info.original_ip},\n"
-                         "\t\tRouter: {info.router},\n"
-                         "\t\tSubnet: {info.subnet},\n"
-                         "\t\tResolver: {info.original_resolver}".format(info=info))
+            logging.info("Gathered information:\n"
+                         "IP-Address: {info.original_ip},\n"
+                         "Router: {info.router},\n"
+                         "Subnet: {info.subnet},\n"
+                         "Resolver: {info.original_resolver}".format(info=info))
 
         # GET ACTIVE CLIENTS INFO
         logging.info("Scanning network for active host to get used addresses.")
@@ -150,7 +150,7 @@ def is_configured() -> bool:
     with open(DHCPCD_CONF) as dhcpcd_conf:
         lines = dhcpcd_conf.readlines()
     for line in lines:
-        if "static static ip_address=" in line and not line.strip().startswith("#"):
+        if "static ip_address=" in line and not line.strip().startswith("#"):
             return True
     return False
 

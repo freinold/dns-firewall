@@ -2,7 +2,9 @@
   <dictionary name="Fabian">
     <words>
       <w>asctime</w>
+      <w>awin</w>
       <w>checkconf</w>
+      <w>confgen</w>
       <w>dhcp</w>
       <w>dhcpcd</w>
       <w>dnssec</w>
@@ -13,9 +15,14 @@
       <w>nmap</w>
       <w>nxdomain</w>
       <w>passthru</w>
+      <w>rdnc</w>
       <w>resolv</w>
+      <w>retransfer</w>
       <w>reusability</w>
+      <w>rndc</w>
+      <w>stunnel</w>
       <w>systemctl</w>
+      <w>webgains</w>
     </words>
   </dictionary>
 </component>

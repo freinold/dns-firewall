@@ -1,0 +1,5 @@
+bind9
+bind9utils
+dnsutils
+nmap
+stunnel4
