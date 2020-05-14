@@ -49,10 +49,9 @@ def main() -> None:
     make_directory()
     configure_logs(interactive=True)
     # Check if dns_firewall is already installed
-    is_installed: bool = os.path.isfile(FW_IS_INSTALLED)
-    if not is_installed:
-        logging.warning("Software not installed. Starting installation now.")
+    if not os.path.isfile(FW_IS_INSTALLED):
         install()
+    load()
 
 
 def run() -> None:
@@ -96,6 +95,7 @@ def configure_logs(interactive: bool = False) -> None:
 
 def install() -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
+    logging.warning("Software not installed. Starting installation now.")
     # DOWNLOAD PACKAGES (WILL BE DONE BY APP-CONTROLLER)
     logging.info("Downloading all required packages.")
     with open("apt_packages") as file:
@@ -115,6 +115,7 @@ def install() -> None:
     # CONFIGURE STATIC IP
     if not static_ip.is_configured():
         static_ip.configure(self_as_resolver=True)
+        logging.info("Static IP configuration successful, waiting 10 seconds for changes to come into effect.")
         time.sleep(10)
     else:
         info = static_ip.get_info()
