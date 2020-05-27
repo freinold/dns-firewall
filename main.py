@@ -24,11 +24,14 @@ CUSTOM_NAMED_CONF = "/etc/dns-fw/named.conf"
 
 BIND_DIR = "/etc/bind/"
 NAMED_CONF = "/etc/bind/named.conf"
+NAMED_CONF_LOGGING = "/etc/bind/named.conf.logging"
 DB_PASSTHRU = "/etc/bind/db.passthru"
 DOT_CONF = "/etc/stunnel/dot.conf"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
+PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
+
 SLAVE_ZONE_TEMPLATE = "resources/slave_zone_template"
 FORWARD_ZONE_TEMPLATE = "resources/forward_zone_template"
 MASTER_ZONE_TEMPLATE = "resources/master_zone_template"
@@ -197,6 +200,9 @@ def install(install_packages=False) -> None:
 
     with open(CUSTOM_NAMED_CONF, "w") as file:
         file.write(custom_named_conf)
+
+    # COPY PRECONFIGURED NAMED CONF LOGGING TO CORRECT DIRECTORY
+    shutil.copy2(PRECONFIGURED_NAMED_CONF_LOGGING, NAMED_CONF_LOGGING)
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
