@@ -230,7 +230,7 @@ def load() -> None:
     with open(SLAVE_ZONE_TEMPLATE) as file:
         zone_template = file.read()
     # POLICIES & SLAVE ZONES
-    policies = " ".join(list(map(lambda x: 'zone "{0};"'.format(x), configuration.block_zones)))
+    policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), configuration.block_zones)))
     slave_zones = "".join(
         list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_DIR + x),
                  configuration.block_zones)))
