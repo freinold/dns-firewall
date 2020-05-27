@@ -138,12 +138,8 @@ def configure(use_info=False, self_as_resolver=False) -> None:
                     "Please try again or restart services dhcpcd and networking yourself.")
 
 
-def get_info() -> dict:
-    if os.path.isfile(INFO_FILE):
-        with open(INFO_FILE) as info_file:
-            return json.load(info_file)
-    else:
-        return {}
+def is_info() -> bool:
+    return os.path.isfile(INFO_FILE)
 
 
 def is_configured() -> bool:
@@ -170,7 +166,22 @@ def revert() -> None:
             os.remove(DHCPCD_CONF_COPY)
             os.remove(INFO_FILE)
     else:
-        raise Error("Error: No dhcpcd.conf.original file found to revert to.")
+        # NEED TO REMOVE LINES ONE BY ONE WHILE READING THROUGH THEM
+        statements = ["interface ", "static ip_address=", "static routers=", "static domain_name_servers="]
+        with open(DHCPCD_CONF) as file:
+            dhcpcd_conf = file.readlines()
+
+        dynamic_dhcpcd_conf = []
+        for line in dhcpcd_conf:
+            part_of_static_config = False
+            for statement in statements:
+                if statement in line and not line.lstrip().startswith("#"):
+                    part_of_static_config = True
+            if not part_of_static_config:
+                dynamic_dhcpcd_conf.append(line)
+
+        with open(DHCPCD_CONF, "w") as file:
+            file.writelines(dynamic_dhcpcd_conf)
 
 
 def _reboot_network() -> None:  # Can raise bash.CallError

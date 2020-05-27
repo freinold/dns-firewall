@@ -2,6 +2,7 @@
   <dictionary name="Fabian">
     <words>
       <w>asctime</w>
+      <w>autoremove</w>
       <w>awin</w>
       <w>checkconf</w>
       <w>confgen</w>

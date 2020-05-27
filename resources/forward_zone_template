@@ -1,0 +1,6 @@
+
+zone "{NAME}" {
+        type forward;
+        forwarders { {FORWARDER}; };
+        forward only;
+};

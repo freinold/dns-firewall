@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import argparse
 import datetime
+import json
 import logging
 import os
 import shutil
@@ -13,7 +15,6 @@ import static_ip
 # import pi_baseclient.bash as bash
 # import pi_baseclient.static_ip as static_ip
 
-APT_PACKAGES = ["bind9", "bind9utils", "dnsutils", "nmap"]
 
 DIR = "/etc/dns-fw/"
 LOG_FILE = "/etc/dns-fw/log"
@@ -23,11 +24,14 @@ CUSTOM_NAMED_CONF = "/etc/dns-fw/named.conf"
 
 BIND_DIR = "/etc/bind/"
 NAMED_CONF = "/etc/bind/named.conf"
+DB_PASSTHRU = "/etc/bind/db.passthru"
 DOT_CONF = "/etc/stunnel/dot.conf"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
-ZONE_TEMPLATE = "resources/zone_template"
+SLAVE_ZONE_TEMPLATE = "resources/slave_zone_template"
+FORWARD_ZONE_TEMPLATE = "resources/forward_zone_template"
+MASTER_ZONE_TEMPLATE = "resources/master_zone_template"
 SERVER_TEMPLATE = "resources/server_template"
 RPZ_HEADER_TEMPLATE = "resources/rpz_header_template"
 
@@ -43,33 +47,64 @@ LOGO = '''\033[33m
 '''
 
 
+class Configuration:
+    def __init__(self, filename=None):
+        self.forwarders: list
+        self.forward_over_tls: bool
+        self.block_zones: list
+        self.whitelist_domains: list
+        if filename is not None:
+            with open(filename) as file:
+                configuration = json.load(file)
+            self.forwarders = configuration["forwarders"]
+            self.forward_over_tls = configuration["forward_over_tls"]
+            self.block_zones = configuration["block_zones"]
+            self.whitelist_domains = configuration["whitelist_domains"]
+
+
 def main() -> None:
-    """Main function used if script is called directly."""
-    print(LOGO)
+    """Entry point used if script is called directly."""
+    parser = argparse.ArgumentParser(prog="dns-firewall", description="DNS-Firewall for filtering DNS-Queries")
+    parser.add_argument("action", default="start",
+                        help="Specific action, either 'start', 'remove' or 'stop'; default is 'start'")
+    args = parser.parse_args()
+    if args.action == "start":
+        start()
+    elif args.action == "stop":
+        stop()
+    elif args.action == "remove":
+        stop()
+        remove(remove_packages=True)
+
+
+def run() -> None:
+    """Entry point used if called by app controller."""
+    signal.signal(signal.SIGTERM, _sigterm_handler)
     make_directory()
-    configure_logs(interactive=True)
-    # Check if dns_firewall is already installed
+    configure_logs(interactive=False)
     if not os.path.isfile(FW_IS_INSTALLED):
         install()
     load()
 
 
-def run() -> None:
-    """Main function used if called as an app."""
-    signal.signal(signal.SIGTERM, _sigterm_handler)
+def start() -> None:
+    """Sets up logging, checks installation and loads configuration."""
+    print(LOGO)
     make_directory()
-    configure_logs(interactive=False)
-    # TODO: Further calls like in main().
+    configure_logs(interactive=True)
+    if not os.path.isfile(FW_IS_INSTALLED):
+        install(install_packages=True)
+    load()
 
 
 def make_directory() -> None:
-    """Creates own subdirectory in /etc/."""
+    """Creates own subdirectory in /etc."""
     if not os.path.isdir(DIR):
         os.makedirs(DIR, exist_ok=True)
 
 
 def configure_logs(interactive: bool = False) -> None:
-    """Configures logging to own log file."""
+    """Configures logging, either interactive or to file."""
     if interactive:
         # noinspection PyArgumentList
         logging.basicConfig(
@@ -93,92 +128,120 @@ def configure_logs(interactive: bool = False) -> None:
         logging.info("DNS-FIREWALL started.")
 
 
-def install() -> None:
+def install(install_packages=False) -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
     logging.warning("Software not installed. Starting installation now.")
-    # DOWNLOAD PACKAGES (WILL BE DONE BY APP-CONTROLLER)
-    logging.info("Downloading all required packages.")
-    with open("apt_packages") as file:
-        apt_packages = file.readlines()
-    apt_packages = list(map(lambda x: x.strip(), apt_packages))
-    try:
-        bash.call("sudo apt update")
-        bash.call("sudo apt install {0} -y".format(" ".join(apt_packages)))
-    except bash.CallError as error:
-        logging.critical("Critical error installing required packages:\n"
-                         "{0}\n"
-                         "Aborting now.".format(error))
-        exit(-1)
-    finally:
-        logging.info("All required packages downloaded.")
+    # DOWNLOAD PACKAGES (IF NOT DONE BY APP-CONTROLLER)
+    if install_packages:
+        logging.info("Downloading all required packages.")
+        with open("metadata.json") as file:
+            apt_packages = json.load(file)["apt"]
+        try:
+            bash.call("sudo apt update")
+            bash.call("sudo apt install {0} -y".format(" ".join(apt_packages)))
+        except bash.CallError as error:
+            logging.critical("Critical error installing required packages:\n"
+                             "{0}\n"
+                             "Aborting now.".format(error))
+            exit(-1)
+        finally:
+            logging.info("All required packages downloaded.")
 
     # CONFIGURE STATIC IP
+    logging.info("Checking if static IP is already configured.")
     if not static_ip.is_configured():
-        static_ip.configure(self_as_resolver=True)
+        logging.info("Static IP was not configured, starting configuration now.")
+        static_ip.configure()
         logging.info("Static IP configuration successful, waiting 10 seconds for changes to come into effect.")
         time.sleep(10)
-    else:
-        info = static_ip.get_info()
-        if info["resolver"] != info["static_ip"]:
-            static_ip.revert()
-            time.sleep(10)
-            static_ip.configure(use_info=True, self_as_resolver=True)
-            time.sleep(10)
-    info = static_ip.get_info()
+    elif not static_ip.is_info():
+        logging.info("Required context information of static IP configuration not found, reconfiguration needed.")
+        static_ip.revert()
+        logging.info("Reverted IP settings, sleeping 10 seconds for changes to come into effect.")
+        time.sleep(10)
+        static_ip.configure(self_as_resolver=False)
+        logging.info("Configured new IP settings, sleeping 10 seconds for changes to come into effect.")
+        time.sleep(10)
 
-    # QUERY OLD RESOLVER FOR NAME OF ROUTER
+    info = static_ip.Info(filename=static_ip.INFO_FILE)
+    logging.info("Static IP configuration finished.")
+
+    # QUERY OLD RESOLVER FOR PTR RECORDS OF ROUTER
     try:
-        router_name = bash.call("sudo nmap -sn -R {0} --dns-servers {1} | "
-                                "grep 'scan report' | "
-                                "awk '{{print $5}}'".format(info["router"], info["original_resolver"]))
-    except bash.CallError as error:
+        router_names = bash.call("dig @{0} -x {1} | "
+                                 "grep PTR | "
+                                 "awk '{{print $5}}'").format(info.original_resolver, info.router).splitlines()
+        router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
+    except bash.CallError:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
-        router_name = ""
+        router_names = []
 
     # BUILD CUSTOM BIND CONFIGURATION
     with open(BLANK_NAMED_CONF) as file:
         custom_named_conf = file.read()
-        custom_named_conf = custom_named_conf.replace("{SUBNET}", info["subnet"])
-        if len(router_name) > 0:
-            custom_named_conf = custom_named_conf \
-                .replace("//", "") \
-                .replace("{ROUTER_NAME}", router_name) \
-                .replace("{ORIGINAL_RESOLVER}", info["original_resolver"])
+
+    custom_named_conf = custom_named_conf.replace("{SUBNET}", info.subnet)
+
+    if len(router_names) > 0:
+        with open(FORWARD_ZONE_TEMPLATE) as file:
+            forward_zone_template = file.read()
+
+        forward_zones = ""
+
+        for name in router_names:
+            forward_zones += forward_zone_template.replace("{NAME}", name) \
+                .replace("{FORWARDER}", info.original_resolver)
+
+        custom_named_conf = custom_named_conf.replace("{FORWARD_ZONES}", forward_zones)
+
     with open(CUSTOM_NAMED_CONF, "w") as file:
         file.write(custom_named_conf)
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
+    os.mknod(FW_IS_INSTALLED)
 
 
 def load() -> None:
     """Loads BIND configuration, generates files from it and restarts server."""
     # LOAD NAMED CONFIG
-    conf = get_conf_dummy()
+    configuration = Configuration(filename="dummy.conf.json")
 
-    with open(ZONE_TEMPLATE) as file:
+    with open(SLAVE_ZONE_TEMPLATE) as file:
         zone_template = file.read()
-    # POLICIES & ZONES
-    policies = " ".join(list(map(lambda x: 'zone "{0};"'.format(x), conf["block_zones"])))
-    zones = "".join(
-        list(map(lambda x: zone_template.replace("{ZONE}", x).replace("{FILE}", BIND_DIR + x), conf["block_zones"])))
+    # POLICIES & SLAVE ZONES
+    policies = " ".join(list(map(lambda x: 'zone "{0};"'.format(x), configuration.block_zones)))
+    slave_zones = "".join(
+        list(map(lambda x: zone_template.replace("{ZONE}", x).replace("{FILE}", BIND_DIR + x),
+                 configuration.block_zones)))
 
     # WHITELIST DB.PASSTHRU
-    if len(conf["whitelist_domains"]) > 0:
+    if len(configuration.whitelist_domains) > 0:
         with open(RPZ_HEADER_TEMPLATE) as file:
-            passthru_zone = file.read()
+            db_passthru = file.read()
 
-        passthru_zone = passthru_zone \
+        db_passthru = db_passthru \
             .replace("{ZONE}", "db.passthru") \
             .replace("{SERIAL}", datetime.datetime.now().strftime("%Y%m%d%H"))
 
-        passthru_zone += "\n".join(list(map(lambda x: "{0}\tCNAME rpz_passthru.".format(x), conf["whitelist_domains"])))
+        db_passthru += "\n".join(
+            list(map(lambda x: "{0}\tCNAME rpz_passthru.".format(x), configuration.whitelist_domains)))
+
+        with open(DB_PASSTHRU, "w") as file:
+            file.write(db_passthru)
 
         policies = 'zone "db.passthru"; ' + policies
-        zones = passthru_zone + zones
+
+        with open(MASTER_ZONE_TEMPLATE) as file:
+            passthru_zone = file.read()
+
+        passthru_zone = passthru_zone.replace("{NAME}", "db.passthru").replace("{FILE}", DB_PASSTHRU)
+    else:
+        os.remove(DB_PASSTHRU)
+        passthru_zone = ""
 
     # FORWARDERS & DNS OVER TLS
-    if conf["forward_over_tls"]:
+    if configuration.forward_over_tls:
         forwarders = "127.0.0.1 port 10853;"
         with open(SERVER_TEMPLATE) as file:
             server = file.read()
@@ -186,18 +249,18 @@ def load() -> None:
         with open(BLANK_DOT_CONF) as file:
             dot_conf = file.read()
 
-        dot_conf = dot_conf.replace("{SERVER}", conf["forwarders"][0])
+        dot_conf = dot_conf.replace("{SERVER}", configuration.forwarders[0])
 
         with open(DOT_CONF, "w") as file:
             file.write(dot_conf)
     else:
-        if "original_resolver" in conf["forwarders"]:
-            forwarders = static_ip.get_info()["original_resolver"] + ";"
+        if "original_resolver" in configuration.forwarders:
+            forwarders = static_ip.Info(static_ip.INFO_FILE).original_resolver + ";"
         else:
-            forwarders = "; ".join(conf["forwarders"]) + ";"
+            forwarders = "; ".join(configuration.forwarders) + ";"
 
-        server = ""
         os.remove(DOT_CONF)
+        server = ""
 
     # FILL ALL INFORMATION INTO NAMED CONFIGURATION
     with open(CUSTOM_NAMED_CONF) as file:
@@ -206,7 +269,8 @@ def load() -> None:
     custom_named_conf = custom_named_conf \
         .replace("{FORWARDERS}", forwarders) \
         .replace("{POLICIES}", policies) \
-        .replace("{ZONES}", zones) \
+        .replace("{PASSTHRU_ZONE}", passthru_zone) \
+        .replace("{SLAVE_ZONES}", slave_zones) \
         .replace("{SERVER}", server)
 
     with open(NAMED_CONF, "w") as file:
@@ -228,8 +292,11 @@ def load() -> None:
     # Reload BIND9
     logging.info("Reloading BIND9 and restarting stunnel for changes to take effect.")
     try:
+        if configuration.forward_over_tls:
+            bash.call("sudo systemctl restart stunnel")
+        else:
+            bash.call("sudo systemctl stop stunnel")
         bash.call("sudo rndc reload")
-        bash.call("sudo systemctl restart stunnel")
     except bash.CallError as error:
         logging.critical("Critical error restarting: {0}\nAborting now.".format(error))
         exit(-1)
@@ -237,38 +304,39 @@ def load() -> None:
         logging.info("Reload successful.")
 
 
-def retransfer() -> None:
-    """Retransfer block zones from master server."""
-    # TODO Check if needed?
+def stop() -> None:
+    """Stops the running services"""
+    bash.call("sudo systemctl stop bind9")
+    bash.call("sudo systemctl stop stunnel4")
 
 
-def get_conf() -> dict:
-    """"""
-    return {}
-
-
-def get_conf_dummy() -> dict:
-    """Dummy function to get configuration as long as server connection is not possible."""
-    return {
-        "forwarders": ["9.9.9.9", "149.112.112.112"],
-        "forward_over_tls": True,
-        "block_zones": ["db.combination.31", "db.ip"],
-        "whitelist_domains": ["awin1.com", "track.webgains.com"]
-    }
-
-
-def remove() -> None:
-    """Stops the service and removes the installed components & created directories."""
-    # TODO: program this lol^
+def remove(remove_packages=False) -> None:
+    """Removes the installed components & created directories."""
+    logging.info("Removing application directory {0}.".format(DIR))
+    bash.call("rm -rf {0}".format(DIR))
+    if remove_packages:
+        logging.info("Removing all packages.")
+        with open("metadata.json") as file:
+            apt_packages = json.load(file)["apt"]
+        try:
+            bash.call("sudo apt remove {0} -y".format(" ".join(apt_packages)))
+            bash.call("sudo apt autoremove")
+        except bash.CallError as error:
+            logging.critical("Critical error removing packages:\n"
+                             "{0}\n"
+                             "Aborting now.".format(error))
+            exit(-1)
+        finally:
+            logging.info("All required packages removed.")
 
 
 def _sigterm_handler(signum, frame) -> None:
-    """Handler set for SIGTERM if firewall is run as app, calls remove()."""
-    logging.info("Signal SIGTERM sent. Calling remove() function.")
+    """Handler set for SIGTERM if firewall is run as app, calls stop & remove, but doesn't remove packages."""
+    logging.info("Signal SIGTERM sent. Stopping and removing application.")
+    stop()
     remove()
     exit(0)
 
 
 if __name__ == '__main__':
     main()
-    # TODO: Add option to call remove instead of main of called with flag of some kind.
