@@ -26,12 +26,15 @@ BIND_DIR = "/etc/bind/"
 NAMED_CONF = "/etc/bind/named.conf"
 NAMED_CONF_LOGGING = "/etc/bind/named.conf.logging"
 DB_PASSTHRU = "/etc/bind/db.passthru"
+
 DOT_CONF = "/etc/stunnel/dot.conf"
+
+BIND_LOG_DIR = "/var/log/bind"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
 PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
-
+NAMED_LOGFILES = "resources/named_logfiles"
 SLAVE_ZONE_TEMPLATE = "resources/slave_zone_template"
 FORWARD_ZONE_TEMPLATE = "resources/forward_zone_template"
 MASTER_ZONE_TEMPLATE = "resources/master_zone_template"
@@ -77,7 +80,7 @@ def main() -> None:
         stop()
     elif args.action == "remove":
         stop()
-        remove(remove_packages=True)
+        remove(remove_packages=True, interactive=True)
 
 
 def run() -> None:
@@ -201,8 +204,14 @@ def install(install_packages=False) -> None:
     with open(CUSTOM_NAMED_CONF, "w") as file:
         file.write(custom_named_conf)
 
-    # COPY PRECONFIGURED NAMED CONF LOGGING TO CORRECT DIRECTORY
+    # SET UP BIND LOGS
     shutil.copy2(PRECONFIGURED_NAMED_CONF_LOGGING, NAMED_CONF_LOGGING)
+    with open(NAMED_LOGFILES) as file:
+        named_logfiles = file.readlines()
+
+    for logfile in named_logfiles:
+        os.mknod(logfile.strip(), mode=0o644)
+        shutil.chown(logfile.strip(), user="bind", group="bind")
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
@@ -219,7 +228,7 @@ def load() -> None:
     # POLICIES & SLAVE ZONES
     policies = " ".join(list(map(lambda x: 'zone "{0};"'.format(x), configuration.block_zones)))
     slave_zones = "".join(
-        list(map(lambda x: zone_template.replace("{ZONE}", x).replace("{FILE}", BIND_DIR + x),
+        list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_DIR + x),
                  configuration.block_zones)))
 
     # WHITELIST DB.PASSTHRU
@@ -313,14 +322,22 @@ def load() -> None:
 
 def stop() -> None:
     """Stops the running services"""
+    configure_logs(interactive=True)
+    logging.info("Stopping BIND and stunnel.")
     bash.call("sudo systemctl stop bind9")
     bash.call("sudo systemctl stop stunnel4")
+    logging.info("Both services stopped successfully.")
 
 
-def remove(remove_packages=False) -> None:
+def remove(remove_packages=False, interactive=False) -> None:
     """Removes the installed components & created directories."""
+    if interactive:
+        confirmation = input("Are you sure you want to delete dns-firewall? [ Yes ]")
+        if confirmation != "Yes":
+            exit(0)
     logging.info("Removing application directory {0}.".format(DIR))
     bash.call("rm -rf {0}".format(DIR))
+    logging.info("Application directory removed.")
     if remove_packages:
         logging.info("Removing all packages.")
         with open("metadata.json") as file:
@@ -334,7 +351,7 @@ def remove(remove_packages=False) -> None:
                              "Aborting now.".format(error))
             exit(-1)
         finally:
-            logging.info("All required packages removed.")
+            logging.info("Packages removed successfully.")
 
 
 def _sigterm_handler(signum, frame) -> None:

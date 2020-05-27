@@ -12,6 +12,7 @@
       <w>dnsutils</w>
       <w>levelname</w>
       <w>localnets</w>
+      <w>logfiles</w>
       <w>nameserver</w>
       <w>nmap</w>
       <w>nxdomain</w>
