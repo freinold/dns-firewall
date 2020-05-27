@@ -170,7 +170,8 @@ def install(install_packages=False) -> None:
     try:
         router_names = bash.call("dig @{0} -x {1} | "
                                  "grep PTR | "
-                                 "awk '{{print $5}}'").format(info.original_resolver, info.router).splitlines()
+                                 "awk '{{print $5}}'").format(info.original_resolver.compressed,
+                                                              info.router.compressed).splitlines()
         router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
     except bash.CallError:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
@@ -180,7 +181,7 @@ def install(install_packages=False) -> None:
     with open(BLANK_NAMED_CONF) as file:
         custom_named_conf = file.read()
 
-    custom_named_conf = custom_named_conf.replace("{SUBNET}", info.subnet)
+    custom_named_conf = custom_named_conf.replace("{SUBNET}", info.subnet.compressed)
 
     if len(router_names) > 0:
         with open(FORWARD_ZONE_TEMPLATE) as file:
@@ -190,7 +191,7 @@ def install(install_packages=False) -> None:
 
         for name in router_names:
             forward_zones += forward_zone_template.replace("{NAME}", name) \
-                .replace("{FORWARDER}", info.original_resolver)
+                .replace("{FORWARDER}", info.original_resolver.compressed)
 
         custom_named_conf = custom_named_conf.replace("{FORWARD_ZONES}", forward_zones)
 
