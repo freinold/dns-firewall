@@ -56,6 +56,13 @@ class Error(Exception):
 
 
 def configure(use_info=False, self_as_resolver=False) -> None:
+    # noinspection PyArgumentList
+    logging.basicConfig(
+        datefmt="%Y-%m-%dT%H:%M:%S%z",
+        format="{asctime} - {levelname:8}: {message}",
+        level=logging.DEBUG,
+        style="{"
+    )
     if is_configured():
         return
     if use_info:

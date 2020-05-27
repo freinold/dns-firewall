@@ -131,7 +131,7 @@ def configure_logs(interactive: bool = False) -> None:
             level=logging.INFO,
             style="{"
         )
-        logging.info("DNS-FIREWALL started.")
+    logging.info("DNS-FIREWALL started.")
 
 
 def install(install_packages=False) -> None:
