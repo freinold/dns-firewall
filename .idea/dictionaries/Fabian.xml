@@ -10,6 +10,7 @@
       <w>dhcpcd</w>
       <w>dnssec</w>
       <w>dnsutils</w>
+      <w>inet</w>
       <w>levelname</w>
       <w>localnets</w>
       <w>logfiles</w>

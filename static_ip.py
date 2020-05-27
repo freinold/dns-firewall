@@ -72,10 +72,12 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         # GET SUBNET INFO
         logging.info("Gathering local subnet and router information.")
         try:
-            output = bash.call("ip route | "
-                               "grep 'default' | "
-                               "awk '{print $3, $7}'")
-            info.router, info.original_ip = map(lambda x: ipaddress.IPv4Address(x), output.strip().split(" "))
+            info.router = ipaddress.IPv4Address(bash.call("ip route | "
+                                                          "grep 'default' | "
+                                                          "awk '{print $3}'").strip())
+            info.original_ip = ipaddress.IPv4Address(bash.call("ip addr show dev eth0 | "
+                                                               "grep 'inet ' | "
+                                                               "awk '{ print $2 }'").split("/")[0])
             info.subnet = ipaddress.IPv4Network(bash.call("ip route | "
                                                           "grep -v 'default' | "
                                                           "awk '{print $1}'").rstrip())
