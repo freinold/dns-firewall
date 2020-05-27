@@ -300,9 +300,9 @@ def load() -> None:
     logging.info("Reloading BIND9 and restarting stunnel for changes to take effect.")
     try:
         if configuration.forward_over_tls:
-            bash.call("sudo systemctl restart stunnel")
+            bash.call("sudo systemctl restart stunnel4")
         else:
-            bash.call("sudo systemctl stop stunnel")
+            bash.call("sudo systemctl stop stunnel4")
         bash.call("sudo rndc reload")
     except bash.CallError as error:
         logging.critical("Critical error restarting: {0}\nAborting now.".format(error))
