@@ -206,12 +206,16 @@ def install(install_packages=False) -> None:
 
     # SET UP BIND LOGS
     shutil.copy2(PRECONFIGURED_NAMED_CONF_LOGGING, NAMED_CONF_LOGGING)
+
+    os.makedirs(BIND_LOG_DIR, exist_ok=True)
+
     with open(NAMED_LOGFILES) as file:
         named_logfiles = file.readlines()
 
     for logfile in named_logfiles:
         os.mknod(logfile.strip(), mode=0o644)
-        shutil.chown(logfile.strip(), user="bind", group="bind")
+
+    shutil.chown(BIND_LOG_DIR, user="bind", group="bind")
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
