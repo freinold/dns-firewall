@@ -177,8 +177,10 @@ def configure(install_packages=False) -> None:
                                  "grep PTR | "
                                  "awk '{{print $5}}'".format(info.original_resolver.compressed,
                                                              info.router.compressed)).splitlines()
-        logging.debug("Router names: {0}".format(router_names))
+        logging.debug("Router names non formatted: {0}".format(router_names))
         router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
+        logging.debug("Router names formatted: {0}".format(router_names))
+
     except bash.CallError:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
         router_names = []
