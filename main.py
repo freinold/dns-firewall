@@ -72,10 +72,18 @@ def main() -> None:
     """Entry point used if script is called directly."""
     parser = argparse.ArgumentParser(prog="dns-firewall", description="DNS-Firewall for filtering DNS-Queries")
     parser.add_argument("action", default="start",
-                        help="Specific action, either 'start', 'remove' or 'stop'; default is 'start'")
+                        help="One of 'start', 'stop', 'reconfigure' or 'remove'; default is 'start'")
     args = parser.parse_args()
+    print(LOGO)
+    make_directory()
+    configure_logs(interactive=True)
     if args.action == "start":
-        start()
+        if not os.path.isfile(FW_IS_INSTALLED):
+            configure(install_packages=True)
+        load()
+    elif args.action == "reconfigure":
+        configure(install_packages=False)
+        load()
     elif args.action == "stop":
         stop()
     elif args.action == "remove":
@@ -89,17 +97,7 @@ def run() -> None:
     make_directory()
     configure_logs(interactive=False)
     if not os.path.isfile(FW_IS_INSTALLED):
-        install()
-    load()
-
-
-def start() -> None:
-    """Sets up logging, checks installation and loads configuration."""
-    print(LOGO)
-    make_directory()
-    configure_logs(interactive=True)
-    if not os.path.isfile(FW_IS_INSTALLED):
-        install(install_packages=True)
+        configure()
     load()
 
 
@@ -134,7 +132,7 @@ def configure_logs(interactive: bool = False) -> None:
     logging.info("DNS-FIREWALL started.")
 
 
-def install(install_packages=False) -> None:
+def configure(install_packages=False) -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
     logging.warning("Software not installed. Starting installation now.")
     # DOWNLOAD PACKAGES (IF NOT DONE BY APP-CONTROLLER)
@@ -327,7 +325,6 @@ def load() -> None:
 
 def stop() -> None:
     """Stops the running services"""
-    configure_logs(interactive=True)
     logging.info("Stopping BIND and stunnel.")
     bash.call("sudo systemctl stop bind9")
     bash.call("sudo systemctl stop stunnel4")
