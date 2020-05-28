@@ -1,6 +1,6 @@
 
 zone "{NAME}" {
         type slave;
-        masters { 129.187.208.46; }
+        masters { 129.187.208.46; };
         file "{FILE}";
 };

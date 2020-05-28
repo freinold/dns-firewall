@@ -179,6 +179,7 @@ def install(install_packages=False) -> None:
                                  "awk '{{print $5}}'").format(info.original_resolver.compressed,
                                                               info.router.compressed).splitlines()
         router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
+        logging.info("Router names: {0}".format(router_names))
     except bash.CallError:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
         router_names = []
@@ -189,17 +190,17 @@ def install(install_packages=False) -> None:
 
     custom_named_conf = custom_named_conf.replace("{SUBNET}", info.subnet.compressed)
 
+    forward_zones = ""
+
     if len(router_names) > 0:
         with open(FORWARD_ZONE_TEMPLATE) as file:
             forward_zone_template = file.read()
-
-        forward_zones = ""
 
         for name in router_names:
             forward_zones += forward_zone_template.replace("{NAME}", name) \
                 .replace("{FORWARDER}", info.original_resolver.compressed)
 
-        custom_named_conf = custom_named_conf.replace("{FORWARD_ZONES}", forward_zones)
+    custom_named_conf = custom_named_conf.replace("{FORWARD_ZONES}", forward_zones)
 
     with open(CUSTOM_NAMED_CONF, "w") as file:
         file.write(custom_named_conf)
