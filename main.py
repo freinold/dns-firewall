@@ -175,8 +175,8 @@ def configure(install_packages=False) -> None:
     try:
         router_names = bash.call("dig @{0} -x {1} | "
                                  "grep PTR | "
-                                 "awk '{{print $5}}'").format(info.original_resolver.compressed,
-                                                              info.router.compressed).splitlines()
+                                 "awk '{{print $5}}'".format(info.original_resolver.compressed,
+                                                             info.router.compressed)).splitlines()
         logging.debug("Router names: {0}".format(router_names))
         router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
     except bash.CallError:
