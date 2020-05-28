@@ -79,6 +79,7 @@ def main() -> None:
     configure_logs(interactive=True)
     if args.action == "start":
         if not os.path.isfile(FW_IS_INSTALLED):
+            logging.warning("Software is not installed.")
             configure(install_packages=True)
         load()
     elif args.action == "reconfigure":
@@ -135,7 +136,7 @@ def configure_logs(interactive: bool = False) -> None:
 
 def configure(install_packages=False) -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
-    logging.warning("Software not installed. Starting installation now.")
+    logging.warning("Starting installation now.")
     # DOWNLOAD PACKAGES (IF NOT DONE BY APP-CONTROLLER)
     if install_packages:
         logging.info("Downloading all required packages.")
@@ -227,18 +228,21 @@ def configure(install_packages=False) -> None:
 
 def load() -> None:
     """Loads BIND configuration, generates files from it and restarts server."""
+    logging.info("Generating & loading individual configuration.")
     # LOAD NAMED CONFIG
     configuration = Configuration(filename="dummy.conf.json")
 
+    # POLICIES & SLAVE ZONES
+    logging.info("Generating slave blocking zones.")
     with open(SLAVE_ZONE_TEMPLATE) as file:
         zone_template = file.read()
-    # POLICIES & SLAVE ZONES
     policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), configuration.block_zones)))
     slave_zones = "".join(
         list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_DIR + x),
                  configuration.block_zones)))
 
     # WHITELIST DB.PASSTHRU
+    logging.info("Generating whitelist zone.")
     if len(configuration.whitelist_domains) > 0:
         with open(RPZ_HEADER_TEMPLATE) as file:
             db_passthru = file.read()
@@ -264,6 +268,7 @@ def load() -> None:
         passthru_zone = ""
 
     # FORWARDERS & DNS OVER TLS
+    logging.info("Generating forwarding configuration.")
     if configuration.forward_over_tls:
         forwarders = "127.0.0.1 port 10853;"
         with open(SERVER_TEMPLATE) as file:
@@ -286,6 +291,7 @@ def load() -> None:
         server = ""
 
     # FILL ALL INFORMATION INTO NAMED CONFIGURATION
+    logging.info("Fill BIND9 configuration with generated statements.")
     with open(CUSTOM_NAMED_CONF) as file:
         custom_named_conf = file.read()
 
@@ -300,6 +306,7 @@ def load() -> None:
         file.write(custom_named_conf)
 
     # CHECK CONFIGURATION
+    logging.info("Checking BIND9 configuration.")
     try:
         output = bash.call("sudo named-checkconf")
         if output != "":
@@ -313,7 +320,7 @@ def load() -> None:
                          "Aborting now.".format(error))
 
     # Reload BIND9
-    logging.info("Reloading BIND9 and restarting stunnel for changes to take effect.")
+    logging.info("Reloading BIND9 / stunnel for changes to take effect.")
     try:
         if configuration.forward_over_tls:
             bash.call("sudo systemctl restart stunnel4")
