@@ -82,6 +82,7 @@ def main() -> None:
             configure(install_packages=True)
         load()
     elif args.action == "reconfigure":
+        os.remove(FW_IS_INSTALLED)
         configure(install_packages=False)
         load()
     elif args.action == "stop":
