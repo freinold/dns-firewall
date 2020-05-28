@@ -212,7 +212,8 @@ def configure(install_packages=False) -> None:
         named_logfiles = file.readlines()
 
     for logfile in named_logfiles:
-        os.mknod(logfile.strip(), mode=0o644)
+        if not os.path.isfile(logfile.strip()):
+            os.mknod(logfile.strip(), mode=0o644)
 
     shutil.chown(BIND_LOG_DIR, user="bind", group="bind")
 
