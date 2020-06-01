@@ -136,7 +136,7 @@ def configure_logs(interactive: bool = False) -> None:
 
 def configure(install_packages=False) -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
-    logging.warning("Starting installation now.")
+    logging.warning("Starting configuration now.")
     # DOWNLOAD PACKAGES (IF NOT DONE BY APP-CONTROLLER)
     if install_packages:
         logging.info("Downloading all required packages.")
@@ -228,7 +228,7 @@ def configure(install_packages=False) -> None:
 
 def load() -> None:
     """Loads BIND configuration, generates files from it and restarts server."""
-    logging.info("Generating & loading individual configuration.")
+    logging.info("Starting load of individual configuration.")
     # LOAD NAMED CONFIG
     configuration = Configuration(filename="dummy.conf.json")
 
@@ -252,7 +252,7 @@ def load() -> None:
             .replace("{SERIAL}", datetime.datetime.now().strftime("%Y%m%d%H"))
 
         db_passthru += "\n".join(
-            list(map(lambda x: "{0}\tCNAME rpz_passthru.".format(x), configuration.whitelist_domains)))
+            list(map(lambda x: "{0}\tCNAME rpz-passthru.".format(x), configuration.whitelist_domains)))
 
         with open(DB_PASSTHRU, "w") as file:
             file.write(db_passthru)
