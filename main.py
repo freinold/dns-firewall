@@ -16,9 +16,9 @@ import static_ip
 # import pi_baseclient.static_ip as static_ip
 
 
-DIR = "/etc/dns-fw/"
-LOG_FILE = "/etc/dns-fw/log"
-FW_CONF = DIR + "/etc/dns-fw/fw.conf.json"
+FW_DIR = "/etc/dns-fw/"
+FW_LOG = "/etc/dns-fw/log"
+FW_CONF = FW_DIR + "/etc/dns-fw/fw.conf.json"
 FW_IS_INSTALLED = "/etc/dns-fw/installed"
 CUSTOM_NAMED_CONF = "/etc/dns-fw/named.conf"
 
@@ -29,7 +29,8 @@ DB_PASSTHRU = "/etc/bind/db.passthru"
 
 DOT_CONF = "/etc/stunnel/dot.conf"
 
-BIND_LOG_DIR = "/var/log/bind"
+BIND_CACHE_DIR = "/var/cache/named"
+BIND_LOG_DIR = "/var/log/named"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
@@ -75,7 +76,7 @@ def main() -> None:
                         help="One of 'start', 'stop', 'reconfigure' or 'remove'; default is 'start'")
     args = parser.parse_args()
     print(LOGO)
-    make_directory()
+    make_directories()
     configure_logs(interactive=True)
     if args.action == "start":
         if not os.path.isfile(FW_IS_INSTALLED):
@@ -96,17 +97,21 @@ def main() -> None:
 def run() -> None:
     """Entry point used if called by app controller."""
     signal.signal(signal.SIGTERM, _sigterm_handler)
-    make_directory()
+    make_directories()
     configure_logs(interactive=False)
     if not os.path.isfile(FW_IS_INSTALLED):
         configure()
     load()
 
 
-def make_directory() -> None:
-    """Creates own subdirectory in /etc."""
-    if not os.path.isdir(DIR):
-        os.makedirs(DIR, exist_ok=True)
+def make_directories() -> None:
+    """Creates needed directories in /etc and /var."""
+    for directory in [FW_DIR, BIND_LOG_DIR, BIND_CACHE_DIR]:
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+
+    shutil.chown(BIND_LOG_DIR, user="bind", group="bind")
+    shutil.chown(BIND_CACHE_DIR, user="bind", group="bind")
 
 
 def configure_logs(interactive: bool = False) -> None:
@@ -120,12 +125,12 @@ def configure_logs(interactive: bool = False) -> None:
             style="{"
         )
     else:
-        if not os.path.isfile(LOG_FILE):
-            os.mknod(LOG_FILE)
+        if not os.path.isfile(FW_LOG):
+            os.mknod(FW_LOG)
         # noinspection PyArgumentList
         logging.basicConfig(
             datefmt="%Y-%m-%dT%H:%M:%S%z",
-            filename=LOG_FILE,
+            filename=FW_LOG,
             filemode="a",
             format="{asctime} - {levelname:8}: {message}",
             level=logging.INFO,
@@ -210,9 +215,6 @@ def configure(install_packages=False) -> None:
     # SET UP BIND LOGS
     shutil.copy2(PRECONFIGURED_NAMED_CONF_LOGGING, NAMED_CONF_LOGGING)
 
-    os.makedirs(BIND_LOG_DIR, exist_ok=True)
-    shutil.chown(BIND_LOG_DIR, user="bind", group="bind")
-
     with open(NAMED_LOGFILES) as file:
         named_logfiles = file.readlines()
 
@@ -238,7 +240,7 @@ def load() -> None:
         zone_template = file.read()
     policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), configuration.block_zones)))
     slave_zones = "".join(
-        list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_DIR + x),
+        list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_CACHE_DIR + x),
                  configuration.block_zones)))
 
     # WHITELIST DB.PASSTHRU
@@ -348,8 +350,8 @@ def remove(remove_packages=False, interactive=False) -> None:
         confirmation = input("Are you sure you want to delete dns-firewall? [ Yes ]")
         if confirmation != "Yes":
             exit(0)
-    logging.info("Removing application directory {0}.".format(DIR))
-    bash.call("rm -rf {0}".format(DIR))
+    logging.info("Removing application directory {0}.".format(FW_DIR))
+    bash.call("rm -rf {0}".format(FW_DIR))
     logging.info("Application directory removed.")
     if remove_packages:
         logging.info("Removing all packages.")
