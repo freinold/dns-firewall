@@ -29,8 +29,8 @@ DB_PASSTHRU = "/etc/bind/db.passthru"
 
 DOT_CONF = "/etc/stunnel/dot.conf"
 
-NAMED_CACHE_DIR = "/var/cache/named"
-NAMED_LOG_DIR = "/var/log/named"
+NAMED_CACHE_DIR = "/var/cache/named/"
+NAMED_LOG_DIR = "/var/log/named/"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
