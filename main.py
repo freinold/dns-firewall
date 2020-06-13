@@ -29,8 +29,8 @@ DB_PASSTHRU = "/etc/bind/db.passthru"
 
 DOT_CONF = "/etc/stunnel/dot.conf"
 
-BIND_CACHE_DIR = "/var/cache/named"
-BIND_LOG_DIR = "/var/log/named"
+NAMED_CACHE_DIR = "/var/cache/named"
+NAMED_LOG_DIR = "/var/log/named"
 
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
@@ -106,12 +106,12 @@ def run() -> None:
 
 def make_directories() -> None:
     """Creates needed directories in /etc and /var."""
-    for directory in [FW_DIR, BIND_LOG_DIR, BIND_CACHE_DIR]:
+    for directory in [FW_DIR, NAMED_LOG_DIR, NAMED_CACHE_DIR]:
         if not os.path.isdir(directory):
             os.makedirs(directory)
 
-    shutil.chown(BIND_LOG_DIR, user="bind", group="bind")
-    shutil.chown(BIND_CACHE_DIR, user="bind", group="bind")
+    shutil.chown(NAMED_LOG_DIR, user="bind", group="bind")
+    shutil.chown(NAMED_CACHE_DIR, user="bind", group="bind")
 
 
 def configure_logs(interactive: bool = False) -> None:
@@ -219,7 +219,7 @@ def configure(install_packages=False) -> None:
         named_logfiles = file.readlines()
 
     for logfile in named_logfiles:
-        logfile_path = os.path.join(BIND_LOG_DIR, logfile.strip())
+        logfile_path = os.path.join(NAMED_LOG_DIR, logfile.strip())
         if not os.path.isfile(logfile_path):
             os.mknod(logfile_path, mode=0o644)
         shutil.chown(logfile_path, user="bind", group="bind")
@@ -241,7 +241,7 @@ def load() -> None:
         zone_template = file.read()
     policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), configuration.block_zones)))
     slave_zones = "".join(
-        list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", BIND_CACHE_DIR + x),
+        list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", NAMED_CACHE_DIR + x),
                  configuration.block_zones)))
 
     # WHITELIST DB.PASSTHRU
