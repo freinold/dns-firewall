@@ -255,7 +255,7 @@ def load() -> None:
             .replace("{SERIAL}", datetime.datetime.now().strftime("%Y%m%d%H"))
 
         db_passthru += "\n".join(
-            list(map(lambda x: "{0}\tCNAME rpz-passthru.".format(x), configuration.whitelist_domains)))
+            list(map(lambda x: "{0}\tCNAME rpz-passthru.".format(x), configuration.whitelist_domains))) + "\n"
 
         with open(DB_PASSTHRU, "w") as file:
             file.write(db_passthru)
