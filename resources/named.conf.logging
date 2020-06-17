@@ -60,7 +60,7 @@ logging {
 // sent to the channel default_debug (which is also dynamic), but without
 // affecting the regular logging.
 //
-     channel query-errors_log; # {
+     channel query-errors_log {
           file "/var/log/named/query-errors" ; # versions 5 size 20m;
           print-time yes;
           print-category yes;
