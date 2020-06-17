@@ -1,12 +1,6 @@
 {
-  "forwarders": [
-    "9.9.9.9",
-    "149.112.112.112"
-  ],
-  "forward_over_tls": true,
+  "forwarders": [],
+  "forward_over_tls": false,
   "block_zones": [],
-  "whitelist_domains": [
-    "awin1.com",
-    "track.webgains.com"
-  ]
+  "whitelist_domains": []
 }
