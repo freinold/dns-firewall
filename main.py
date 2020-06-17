@@ -32,7 +32,7 @@ DOT_CONF = "/etc/stunnel/dot.conf"
 NAMED_CACHE_DIR = "/var/cache/named/"
 NAMED_LOG_DIR = "/var/log/named/"
 
-BASIC_FW_CONF = "resources/basic.conf.json"
+BASIC_FW_CONF = "resources/basic_fw.conf.json"
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
 PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
@@ -228,8 +228,8 @@ def configure(install_packages=False) -> None:
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
 
-    # COPY DUMMY CONFIG TO FW DIR
-    shutil.copy2()
+    # COPY BASIC CONFIG TO FW DIR
+    shutil.copy2(BASIC_FW_CONF, FW_CONF)
 
     os.mknod(FW_IS_INSTALLED)
 
