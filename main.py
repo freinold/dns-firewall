@@ -292,7 +292,7 @@ def load() -> None:
         if len(configuration.forwarders) > 0:
             forwarders = "; ".join(configuration.forwarders) + ";"
         else:
-            forwarders = static_ip.Info(static_ip.INFO_FILE).original_resolver + ";"
+            forwarders = static_ip.Info(static_ip.INFO_FILE).original_resolver.exploded + ";"
 
         os.remove(DOT_CONF)
         server = ""
