@@ -4,10 +4,7 @@
     "149.112.112.112"
   ],
   "forward_over_tls": true,
-  "block_zones": [
-    "db.combination.31",
-    "db.ip"
-  ],
+  "block_zones": [],
   "whitelist_domains": [
     "awin1.com",
     "track.webgains.com"

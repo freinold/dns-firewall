@@ -32,6 +32,7 @@ DOT_CONF = "/etc/stunnel/dot.conf"
 NAMED_CACHE_DIR = "/var/cache/named/"
 NAMED_LOG_DIR = "/var/log/named/"
 
+BASIC_FW_CONF = "resources/basic.conf.json"
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
 PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
@@ -226,6 +227,10 @@ def configure(install_packages=False) -> None:
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
+
+    # COPY DUMMY CONFIG TO FW DIR
+    shutil.copy2()
+
     os.mknod(FW_IS_INSTALLED)
 
 
@@ -233,7 +238,7 @@ def load() -> None:
     """Loads BIND configuration, generates files from it and restarts server."""
     logging.info("Starting load of individual configuration.")
     # LOAD NAMED CONFIG
-    configuration = Configuration(filename="dummy.conf.json")
+    configuration = Configuration(filename=FW_CONF)
 
     # POLICIES & SLAVE ZONES
     logging.info("Generating slave blocking zones.")
