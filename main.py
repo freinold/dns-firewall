@@ -18,7 +18,7 @@ import static_ip
 
 FW_DIR = "/etc/dns-fw/"
 FW_LOG = "/etc/dns-fw/log"
-FW_CONF = FW_DIR + "/etc/dns-fw/fw.conf.json"
+FW_CONF = "/etc/dns-fw/fw.conf.json"
 FW_IS_INSTALLED = "/etc/dns-fw/installed"
 CUSTOM_NAMED_CONF = "/etc/dns-fw/named.conf"
 
