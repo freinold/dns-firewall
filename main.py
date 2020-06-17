@@ -180,17 +180,25 @@ def configure(install_packages=False) -> None:
 
     # QUERY OLD RESOLVER FOR PTR RECORDS OF ROUTER
     try:
-        router_names = bash.call("dig @{0} -x {1} | "
-                                 "grep PTR | "
-                                 "awk '{{print $5}}'".format(info.original_resolver.compressed,
-                                                             info.router.compressed)).splitlines()
-        logging.debug("Router names non formatted: {0}".format(router_names))
-        router_names = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, router_names)))
-        logging.debug("Router names formatted: {0}".format(router_names))
+        forward_domains = bash.call("dig @{0} -x {1} | "
+                                    "grep PTR | "
+                                    "awk '{{print $5}}'".format(info.original_resolver.compressed,
+                                                                info.router.compressed)).splitlines()
+        logging.debug("Router names non formatted: {0}".format(forward_domains))
+        forward_domains = list(map(lambda x: x[:-1], filter(lambda x: len(x) > 0, forward_domains)))
+        logging.debug("Router names formatted: {0}".format(forward_domains))
 
     except bash.CallError:
         logging.error("Error: Could not retrieve routers name from original resolver. Access via domain not possible.")
-        router_names = []
+        forward_domains = []
+
+    # GENERATE REVERSE LOOKUP ZONES
+    reverse_zone = info.subnet.network_address.reverse_pointer
+
+    while reverse_zone.startswith("0."):
+        reverse_zone = reverse_zone[2:]
+
+    forward_domains.append(reverse_zone)
 
     # BUILD CUSTOM BIND CONFIGURATION
     with open(BLANK_NAMED_CONF) as file:
@@ -200,13 +208,12 @@ def configure(install_packages=False) -> None:
 
     forward_zones = ""
 
-    if len(router_names) > 0:
-        with open(FORWARD_ZONE_TEMPLATE) as file:
-            forward_zone_template = file.read()
+    with open(FORWARD_ZONE_TEMPLATE) as file:
+        forward_zone_template = file.read()
 
-        for name in router_names:
-            forward_zones += forward_zone_template.replace("{NAME}", name) \
-                .replace("{FORWARDER}", info.original_resolver.compressed)
+    for name in forward_domains:
+        forward_zones += forward_zone_template.replace("{NAME}", name) \
+            .replace("{FORWARDER}", info.original_resolver.compressed)
 
     custom_named_conf = custom_named_conf.replace("{FORWARD_ZONES}", forward_zones)
 
