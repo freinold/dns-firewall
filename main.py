@@ -294,7 +294,8 @@ def load() -> None:
         else:
             forwarders = static_ip.Info(static_ip.INFO_FILE).original_resolver.exploded + ";"
 
-        os.remove(DOT_CONF)
+        if os.path.isfile(DOT_CONF):
+            os.remove(DOT_CONF)
         server = ""
 
     # FILL ALL INFORMATION INTO NAMED CONFIGURATION
