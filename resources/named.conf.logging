@@ -35,7 +35,7 @@ logging {
           severity info;
      };
      channel rpz_log {
-          file "/var/log/named/rpz" versions 3; # size 20m;
+          file "/var/log/named/rpz" ; # versions 3 size 20m;
           print-time yes;
           print-category yes;
           print-severity yes;
@@ -46,8 +46,8 @@ logging {
 // by default, make sure you add option ‘querylog no;’ - then you can toggle
 // query logging on (and off again) using command ‘rndc querylog’
 //
-     channel queries_log; # {
-          file "/var/log/named/queries" versions 600 size 20m;
+     channel queries_log {
+          file "/var/log/named/queries" ; # versions 600 size 20m;
           print-time yes;
           print-category yes;
           print-severity yes;
@@ -61,7 +61,7 @@ logging {
 // affecting the regular logging.
 //
      channel query-errors_log; # {
-          file "/var/log/named/query-errors" versions 5 size 20m;
+          file "/var/log/named/query-errors" ; # versions 5 size 20m;
           print-time yes;
           print-category yes;
           print-severity yes;
