@@ -272,7 +272,6 @@ def load() -> None:
 
         passthru_zone = passthru_zone.replace("{NAME}", "db.passthru").replace("{FILE}", DB_PASSTHRU)
     else:
-        os.remove(DB_PASSTHRU)
         passthru_zone = ""
 
     # FORWARDERS & DNS OVER TLS
