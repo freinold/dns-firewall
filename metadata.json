@@ -1,5 +1,6 @@
 {
   "app_name": "dns-firewall:0.1",
+  "configuration_path": "",
   "apt": [
     "bind9",
     "bind9utils",
