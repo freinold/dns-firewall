@@ -6,8 +6,9 @@ import logging
 import os
 import shutil
 import signal
-
 import time
+
+import crontab
 
 import bash
 import static_ip
@@ -26,6 +27,7 @@ BIND_DIR = "/etc/bind/"
 NAMED_CONF = "/etc/bind/named.conf"
 NAMED_CONF_LOGGING = "/etc/bind/named.conf.logging"
 DB_PASSTHRU = "/etc/bind/db.passthru"
+RNDC_KEY = "/etc/bind/rndc.key"
 
 DOT_CONF = "/etc/stunnel/dot.conf"
 
@@ -141,7 +143,7 @@ def configure_logs(interactive: bool = False) -> None:
     logging.info("DNS-FIREWALL started.")
 
 
-def configure(install_packages=False) -> None:
+def configure(install_packages=False, interactive=False) -> None:
     """Installs the dependencies, sets static ip and builds general custom BIND9 configuration."""
     logging.warning("Starting configuration now.")
     # DOWNLOAD PACKAGES (IF NOT DONE BY APP-CONTROLLER)
@@ -236,13 +238,30 @@ def configure(install_packages=False) -> None:
             os.mknod(logfile_path, mode=0o644)
         shutil.chown(logfile_path, user="bind", group="bind")
 
+    # MAKE SURE RNDC IS USEABLE
+    shutil.chown(RNDC_KEY, user="root", group="bind")
+    os.chmod(RNDC_KEY, 640)
+
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
 
     # COPY BASIC CONFIG TO FW DIR
     shutil.copy2(BASIC_FW_CONF, FW_CONF)
 
+    # ADD CRONTAB FOR BOOT
+    if interactive:
+        cron = crontab.CronTab(user="root")
+        for _ in cron.find_comment("DNS-Firewall"):
+            break
+        else:
+            own_path = os.path.realpath(__file__)
+            python_path = bash.call("which python3").strip()
+            job = cron.new(command="{0} {1} start".format(python_path, own_path), comment="DNS-Firewall")
+            job.every_reboot()
+            cron.write()
+
     os.mknod(FW_IS_INSTALLED)
+    bash.call("reboot")
 
 
 def load() -> None:
@@ -367,9 +386,16 @@ def remove(remove_packages=False, interactive=False) -> None:
         confirmation = input("Are you sure you want to delete dns-firewall? [ Yes ]")
         if confirmation != "Yes":
             exit(0)
+
+    # REMOVE CRON JOB
+    cron = crontab.CronTab(user="root")
+    cron.remove_all(comment="DNS-Firewall")
+
+    # REMOVE DIR
     logging.info("Removing application directory {0}.".format(FW_DIR))
     bash.call("rm -rf {0}".format(FW_DIR))
     logging.info("Application directory removed.")
+
     if remove_packages:
         logging.info("Removing all packages.")
         with open("metadata.json") as file:
