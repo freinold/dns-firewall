@@ -75,7 +75,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         # GET SUBNET INFO
         logging.info("Gathering local subnet and router information.")
         try:
-            is_ethernet_connected = bash.call("ip a | grep 'eth0'").strip()
+            is_ethernet_connected = bash.call("ip route | grep 'eth0'").strip()
             info.interface = "eth0" if is_ethernet_connected else "wlan0"
             info.router = ipaddress.IPv4Address(bash.call("ip route | "
                                                           "grep 'default' | "
