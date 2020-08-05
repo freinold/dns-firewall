@@ -14,10 +14,10 @@ NET_DIRECTORY = "/sys/class/net"
 
 STATIC_DHCPCD_CONF = '''
 # Static IPv4 configuration, provided by python3 script static_ip.py
-interface eth0
-static ip_address={0}
-static routers={1}
-static domain_name_servers={2}
+interface {0}
+static ip_address={1}
+static routers={2}
+static domain_name_servers={3}
 '''
 
 
@@ -29,6 +29,7 @@ class Info:
         self.original_resolver: ipaddress.IPv4Address
         self.static_ip: ipaddress.IPv4Address
         self.resolver: ipaddress.IPv4Address
+        self.interface: str
         if filename is not None:
             with open(filename) as file:
                 info = json.load(file)
@@ -38,6 +39,7 @@ class Info:
             self.original_resolver = ipaddress.IPv4Address(info["original_resolver"])
             self.static_ip = ipaddress.IPv4Address(info["static_ip"])
             self.resolver = ipaddress.IPv4Address(info["resolver"])
+            self.interface = info["interface"]
 
     def save(self, filename):
         with open(filename, "w") as file:
@@ -47,7 +49,8 @@ class Info:
                 "original_ip": self.original_ip.exploded,
                 "original_resolver": self.original_resolver.exploded,
                 "static_ip": self.static_ip.exploded,
-                "resolver": self.resolver.exploded
+                "resolver": self.resolver.exploded,
+                "interface": self.interface
             }, file)
 
 
@@ -72,17 +75,20 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         # GET SUBNET INFO
         logging.info("Gathering local subnet and router information.")
         try:
+            is_ethernet_connected = bash.call("ip a | grep 'eth0'").strip()
+            info.interface = "eth0" if is_ethernet_connected else "wlan0"
             info.router = ipaddress.IPv4Address(bash.call("ip route | "
                                                           "grep 'default' | "
-                                                          "grep 'eth0' | "
-                                                          "awk '{print $3}'").strip())
-            info.original_ip = ipaddress.IPv4Address(bash.call("ip addr show dev eth0 | "
+                                                          "grep '{0}' | "
+                                                          "awk '{{print $3}}'".format(info.interface)).strip())
+            info.original_ip = ipaddress.IPv4Address(bash.call("ip addr show dev {0} | "
                                                                "grep 'inet ' | "
-                                                               "awk '{ print $2 }'").split("/")[0])
+                                                               "awk '{{ print $2 }}'".format(info.interface)).split(
+                "/")[0])
             info.subnet = ipaddress.IPv4Network(bash.call("ip route | "
                                                           "grep -v 'default' | "
-                                                          "grep 'eth0' | "
-                                                          "awk '{print $1}'").rstrip())
+                                                          "grep '{0}' | "
+                                                          "awk '{{print $1}}'".format(info.interface)).rstrip())
             info.original_resolver = ipaddress.IPv4Address(bash.call("cat /etc/resolv.conf | "
                                                                      "grep -m 1 'nameserver' | "
                                                                      "awk '{print $2}'").rstrip())
@@ -93,6 +99,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
             exit(-1)
         finally:
             logging.info("Gathered information:\n"
+                         "Interface: {info.interface}\n"
                          "IP-Address: {info.original_ip},\n"
                          "Router: {info.router},\n"
                          "Subnet: {info.subnet},\n"
@@ -133,7 +140,8 @@ def configure(use_info=False, self_as_resolver=False) -> None:
     shutil.copy2(DHCPCD_CONF, DHCPCD_CONF + ".original")
     logging.debug("Saved original dhcpcd.conf with suffix '.original'.")
     with open(DHCPCD_CONF, "a") as dhcpcd_conf:
-        static_conf = STATIC_DHCPCD_CONF.format(info.static_ip,
+        static_conf = STATIC_DHCPCD_CONF.format(info.interface,
+                                                info.static_ip,
                                                 info.router,
                                                 info.resolver)
         dhcpcd_conf.write(static_conf)
