@@ -83,7 +83,7 @@ def main() -> None:
     if args.action == "start":
         if not os.path.isfile(FW_IS_INSTALLED):
             logging.warning("Software is not installed.")
-            configure(install_packages=True)
+            configure(install_packages=True, interactive=True)
         load()
     elif args.action == "reconfigure":
         os.remove(FW_IS_INSTALLED)
