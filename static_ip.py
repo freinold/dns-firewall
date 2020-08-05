@@ -74,6 +74,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         try:
             info.router = ipaddress.IPv4Address(bash.call("ip route | "
                                                           "grep 'default' | "
+                                                          "grep 'eth0' | "
                                                           "awk '{print $3}'").strip())
             info.original_ip = ipaddress.IPv4Address(bash.call("ip addr show dev eth0 | "
                                                                "grep 'inet ' | "
