@@ -81,6 +81,7 @@ def configure(use_info=False, self_as_resolver=False) -> None:
                                                                "awk '{ print $2 }'").split("/")[0])
             info.subnet = ipaddress.IPv4Network(bash.call("ip route | "
                                                           "grep -v 'default' | "
+                                                          "grep 'eth0' | "
                                                           "awk '{print $1}'").rstrip())
             info.original_resolver = ipaddress.IPv4Address(bash.call("cat /etc/resolv.conf | "
                                                                      "grep -m 1 'nameserver' | "
