@@ -260,6 +260,7 @@ def configure(install_packages=False, interactive=False) -> None:
             job.every_reboot()
             cron.write()
 
+    logging.info("Installation finished, reboot needed. System will configure & load configuration automatically afterwards.")
     os.mknod(FW_IS_INSTALLED)
     bash.call("reboot")
 
