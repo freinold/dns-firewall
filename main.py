@@ -77,7 +77,6 @@ def main() -> None:
                         help="One of 'start', 'stop', 'reconfigure' or 'remove'; default is 'start'")
     args = parser.parse_args()
     print(LOGO)
-    make_directories()
     configure_logs(interactive=True)
     if args.action == "start":
         if not os.path.isfile(FW_IS_INSTALLED):
@@ -107,7 +106,7 @@ def run() -> None:
 
 def make_directories() -> None:
     """Creates needed directories in /etc and /var."""
-    for directory in [FW_DIR, NAMED_LOG_DIR, NAMED_CACHE_DIR]:
+    for directory in [NAMED_LOG_DIR, NAMED_CACHE_DIR]:
         if not os.path.isdir(directory):
             os.makedirs(directory)
 
@@ -126,6 +125,8 @@ def configure_logs(interactive: bool = False) -> None:
             style="{"
         )
     else:
+        if not os.path.isdir(FW_DIR):
+            os.mknod(FW_DIR)
         if not os.path.isfile(FW_LOG):
             os.mknod(FW_LOG)
         # noinspection PyArgumentList
@@ -158,6 +159,9 @@ def configure(install_packages=False) -> None:
             exit(-1)
         finally:
             logging.info("All required packages downloaded.")
+
+    logging.info("Creating needed directories.")
+    make_directories()
 
     # CONFIGURE STATIC IP
     logging.info("Checking if static IP is already configured.")
