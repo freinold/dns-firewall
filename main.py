@@ -370,8 +370,8 @@ def load() -> None:
     except bash.CallError as error:
         logging.critical("Critical error restarting: {0}\nAborting now.".format(error))
         exit(-1)
-    finally:
-        logging.info("Reload successful.")
+
+    logging.info("Reload successful.")
 
 
 def stop() -> None:
