@@ -37,6 +37,7 @@ NAMED_LOG_DIR = "/var/log/named/"
 BASIC_FW_CONF = "resources/basic_fw.conf.json"
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
+KNOWN_FORWARDERS = "resources/forwarders.json"
 PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
 NAMED_LOGFILES = "resources/named_logfiles"
 SLAVE_ZONE_TEMPLATE = "resources/slave_zone_template"
@@ -261,7 +262,8 @@ def configure(install_packages=False, interactive=False) -> None:
             job.every_reboot()
             cron.write()
 
-    logging.info("Installation finished, reboot needed. System will configure & load configuration automatically afterwards.")
+    logging.info(
+        "Installation finished, reboot needed. System will configure & load configuration automatically afterwards.")
     os.mknod(FW_IS_INSTALLED)
     bash.call("reboot")
 
@@ -308,6 +310,13 @@ def load() -> None:
 
     # FORWARDERS & DNS OVER TLS
     logging.info("Generating forwarding configuration.")
+    with open(KNOWN_FORWARDERS) as file:
+        known_forwarders: dict = json.load(file)
+
+    used_forwarders = []
+    for forwarder in configuration.forwarders:
+        used_forwarders.append(known_forwarders.get(forwarder, forwarder))
+
     if configuration.forward_over_tls:
         forwarders = "127.0.0.1 port 10853;"
         with open(SERVER_TEMPLATE) as file:
@@ -316,13 +325,13 @@ def load() -> None:
         with open(BLANK_DOT_CONF) as file:
             dot_conf = file.read()
 
-        dot_conf = dot_conf.replace("{SERVER}", configuration.forwarders[0])
+        dot_conf = dot_conf.replace("{SERVER}", used_forwarders[0])
 
         with open(DOT_CONF, "w") as file:
             file.write(dot_conf)
     else:
-        if len(configuration.forwarders) > 0:
-            forwarders = "; ".join(configuration.forwarders) + ";"
+        if len(used_forwarders) > 0:
+            forwarders = "; ".join(used_forwarders) + ";"
         else:
             forwarders = static_ip.Info(static_ip.INFO_FILE).original_resolver.exploded + ";"
 
@@ -414,8 +423,6 @@ def remove(remove_packages=False, interactive=False) -> None:
             exit(-1)
         finally:
             logging.info("Packages removed successfully.")
-
-
 
 
 def _sigterm_handler(signum, frame) -> None:
