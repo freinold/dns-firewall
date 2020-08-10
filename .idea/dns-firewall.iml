@@ -5,8 +5,9 @@
       <sourceFolder url="file://$MODULE_DIR$/source" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (dns-firewall)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="rpz-server" />
     <orderEntry type="module" module-name="rpz-server" />
   </component>
   <component name="PackageRequirementsSettings">
