@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import ipaddress
 import json
-import logging  # TODO: Handle logging from different modules.
+import logging
 import os.path
 import shutil
 
 import bash
 
-DHCPCD_CONF = "/etc/dhcpcd.conf"  # TODO: Changed for tests!
+DHCPCD_CONF = "/etc/dhcpcd.conf"
 DHCPCD_CONF_COPY = DHCPCD_CONF + ".original"
 INFO_FILE = "/etc/dns-fw/static_ip.info.json"
 NET_DIRECTORY = "/sys/class/net"
@@ -182,8 +182,9 @@ def revert() -> None:
                         "{0}\n"
                         "Please try again or restart services dhcpcd and networking yourself.".format(error))
         finally:
-            os.remove(DHCPCD_CONF_COPY)
-            os.remove(INFO_FILE)
+            for file in [DHCPCD_CONF_COPY, INFO_FILE]:
+                if os.path.isfile(file):
+                    os.remove(file)
     else:
         # NEED TO REMOVE LINES ONE BY ONE WHILE READING THROUGH THEM
         statements = ["interface ", "static ip_address=", "static routers=", "static domain_name_servers="]
