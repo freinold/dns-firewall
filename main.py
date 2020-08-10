@@ -164,6 +164,7 @@ def configure(install_packages=False, interactive=False) -> None:
 
     logging.info("Creating needed directories.")
     make_directories()
+    os.mkdir(FW_DIR)
 
     # CONFIGURE STATIC IP
     logging.info("Checking if static IP is already configured.")
