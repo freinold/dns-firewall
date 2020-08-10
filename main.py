@@ -384,7 +384,7 @@ def stop() -> None:
 def remove(remove_packages=False, interactive=False) -> None:
     """Removes the installed components & created directories."""
     if interactive:
-        confirmation = input("Are you sure you want to delete dns-firewall? [ Yes ]")
+        confirmation = input("Are you sure you want to delete dns-firewall? [ Yes / No ]: ")
         if confirmation != "Yes":
             exit(0)
 
@@ -403,7 +403,9 @@ def remove(remove_packages=False, interactive=False) -> None:
             apt_packages = json.load(file)["apt"]
         try:
             bash.call("sudo apt remove {0} -y".format(" ".join(apt_packages)))
-            bash.call("sudo apt autoremove")
+            bash.call("sudo apt autoremove -y")
+            bash.call("sudo apt clean -y")
+
         except bash.CallError as error:
             logging.critical("Critical error removing packages:\n"
                              "{0}\n"
@@ -411,6 +413,8 @@ def remove(remove_packages=False, interactive=False) -> None:
             exit(-1)
         finally:
             logging.info("Packages removed successfully.")
+
+
 
 
 def _sigterm_handler(signum, frame) -> None:
