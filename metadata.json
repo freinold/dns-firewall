@@ -8,5 +8,7 @@
     "nmap",
     "stunnel4"
   ],
-  "pip": []
+  "pip": [
+    "python-crontab"
+  ]
 }
