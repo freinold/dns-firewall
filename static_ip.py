@@ -77,6 +77,10 @@ def configure(use_info=False, self_as_resolver=False) -> None:
         try:
             is_ethernet_connected = bash.call("ip route | grep 'eth0'").strip()
             info.interface = "eth0" if is_ethernet_connected else "wlan0"
+        except bash.CallError:
+            info.interface = "wlan0"
+
+        try:
             info.router = ipaddress.IPv4Address(bash.call("ip route | "
                                                           "grep 'default' | "
                                                           "grep '{0}' | "
