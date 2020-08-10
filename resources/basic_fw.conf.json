@@ -1,6 +1,6 @@
 {
   "forwarders": [],
   "forward_over_tls": false,
-  "block_zones": [],
+  "block_zones": ["db.combination.31", "db.ip"],
   "whitelist_domains": []
 }
