@@ -87,7 +87,7 @@ def main() -> None:
         load()
     elif args.action == "reconfigure":
         os.remove(FW_IS_INSTALLED)
-        configure(install_packages=False)
+        configure(install_packages=False, interactive=True)
         load()
     elif args.action == "stop":
         stop()
@@ -241,7 +241,7 @@ def configure(install_packages=False, interactive=False) -> None:
 
     # MAKE SURE RNDC IS USEABLE
     shutil.chown(RNDC_KEY, user="root", group="bind")
-    os.chmod(RNDC_KEY, 640)
+    os.chmod(RNDC_KEY, 0o640)
 
     # COPY ORIGINAL BIND CONFIGURATION
     shutil.copy2(NAMED_CONF, NAMED_CONF + ".original")
