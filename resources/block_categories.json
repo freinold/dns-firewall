@@ -1,0 +1,7 @@
+{
+  "suspicious": 0,
+  "advertising": 1,
+  "tracking": 2,
+  "malicious": 3,
+  "bitcoin": 4
+}

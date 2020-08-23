@@ -38,6 +38,7 @@ BASIC_FW_CONF = "resources/basic_fw.conf.json"
 BLANK_DOT_CONF = "resources/dot.conf"
 BLANK_NAMED_CONF = "resources/named.conf"
 KNOWN_FORWARDERS = "resources/forwarders.json"
+BLOCK_CATEGORIES = "resources/block_categories.json"
 PRECONFIGURED_NAMED_CONF_LOGGING = "resources/named.conf.logging"
 NAMED_LOGFILES = "resources/named_logfiles"
 SLAVE_ZONE_TEMPLATE = "resources/slave_zone_template"
@@ -278,10 +279,27 @@ def load() -> None:
     logging.info("Generating slave blocking zones.")
     with open(SLAVE_ZONE_TEMPLATE) as file:
         zone_template = file.read()
-    policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), configuration.block_zones)))
+
+    with open(KNOWN_FORWARDERS) as file:
+        known_forwarders = json.load(file)
+
+    zone_names = []
+    combination_number = 0
+    for entry in configuration.block_zones:
+        if entry in known_forwarders:
+            combination_number = combination_number + 2 ** known_forwarders[entry]
+        elif entry == "ip":
+            zone_names.append("db.ip")
+        else:
+            zone_names.append(entry)
+
+    if combination_number > 0:
+        zone_names.append("db.combination.{0}".format(combination_number))
+
+    policies = " ".join(list(map(lambda x: 'zone "{0}";'.format(x), zone_names)))
     slave_zones = "".join(
         list(map(lambda x: zone_template.replace("{NAME}", x).replace("{FILE}", NAMED_CACHE_DIR + x),
-                 configuration.block_zones)))
+                 zone_names)))
 
     # WHITELIST DB.PASSTHRU
     logging.info("Generating whitelist zone.")
