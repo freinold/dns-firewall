@@ -1,6 +1,6 @@
 {
   "forwarders": [],
   "forward_over_tls": false,
-  "block_zones": ["db.combination.31", "db.ip"],
+  "block_zones": ["suspicious", "advertising", "tracking", "malicious", "bitcoin", "ip"],
   "whitelist_domains": []
 }
